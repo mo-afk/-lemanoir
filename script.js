@@ -211,35 +211,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /* ==========================================================================
-   LA ROULETTE LE MANOIR  —  Wheel of Fortune / Random Dish Spinner
+   LA ROULETTE LE MANOIR  —  Floating Widget (FAB + Modal)
    ==========================================================================
-   • Lit la carte directement depuis le DOM déjà présent dans index.html
-     (sections .menu-section > .popular-card / .menu-item-card) : aucune donnée
-     n'est dupliquée, la roue suit automatiquement la carte et ses vidéos.
-   • Classe chaque article : plat / à-côté / dessert / boisson  +  salé / sucré.
-   • Ne fait gagner qu'un VRAI plat principal, cohérent avec le service choisi
-     (jamais un jus, une frite, une boule de glace ou un accompagnement seul).
+   • Lit la carte depuis le DOM déjà présent dans index.html (rien n'est dupliqué).
+   • Modes Solo / Groupe, tirage tour par tour, pas de doublon à la même table.
+   • Résumé de la table (addition) + mini-jeu "Qui paye l'addition ?".
    ========================================================================== */
 (function () {
     'use strict';
 
     /* ---------------------------------------------------- Configuration --- */
 
-    var SLICE_COUNT     = 8;     // tranches affichées sur la roue
-    var MIN_MAIN_PRICE  = 30;    // en dessous de 30 Dh dans une carte salée = à-côté
-    var SPIN_MS         = 4200;
-    var SPIN_MS_REDUCED = 1200;
-    var FULL_TURNS      = 6;
+    var SLICE_COUNT     = 8;
+    var MIN_MAIN_PRICE  = 30;
+    var SPIN_MS         = 3600;
+    var SPIN_MS_REDUCED = 1100;
+    var FULL_TURNS      = 5;
+    var MIN_GROUP       = 2;
+    var MAX_GROUP       = 8;
 
     var PERIODS = {
-        breakfast: { label: 'Petit-déjeuner', short: 'petit-déjeuner', time: '07h — 11h' },
-        lunch:     { label: 'Déjeuner',       short: 'déjeuner',       time: '12h — 16h' },
-        dinner:    { label: 'Dîner',          short: 'dîner',          time: '19h — 00h' }
+        breakfast: { label: 'Petit-déjeuner', short: 'petit-déjeuner' },
+        lunch:     { label: 'Déjeuner',       short: 'déjeuner' },
+        dinner:    { label: 'Dîner',          short: 'dîner' }
     };
 
-    /* Sections déjà présentes dans index.html : quels services elles couvrent
-       et ce qu'elles contiennent. Les boissons/desserts servent uniquement aux
-       suggestions d'accompagnement — jamais au tirage du plat principal.      */
     var SECTION_META = {
         'petit-dejeuner':   { label: 'Petit Déjeuner',   meals: ['breakfast'] },
         'brunch':           { label: 'Brunch',           meals: ['breakfast', 'lunch'] },
@@ -256,11 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'mocktails':        { label: 'Mocktails',        kind: 'drink', meals: ['lunch', 'dinner'] }
     };
 
-    /* Filets de sécurité pour les futures sections : on devine d'après le titre */
     var DRINK_HINTS   = ['boisson', 'coffee', 'cafe', 'milkshake', 'smoothie', 'mocktail', 'mojito', 'the', 'jus', 'soda'];
     var DESSERT_HINTS = ['dessert', 'glace', 'tartufo', 'patisserie', 'gaufre', 'pancake', 'choux'];
 
-    /* Ce qui n'est PAS un plat principal */
     var SIDE_WORDS = ['frites', 'fry', 'fries', 'onion rings', 'nuggets', 'mozzarella sticks',
                       'jalapeno', 'cheesy', 'potatoes', 'supplement', 'boule', 'tranche',
                       'topping', 'crouton'];
@@ -276,50 +270,20 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ------------------------------------------------------------- Utils --- */
 
     function normalize(str) {
-        return String(str || '')
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9 ]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
+        return String(str || '').toLowerCase().normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ')
+            .replace(/\s+/g, ' ').trim();
     }
-
-    function hasAny(haystack, words) {
-        for (var i = 0; i < words.length; i++) {
-            if (haystack.indexOf(words[i]) !== -1) return true;
-        }
-        return false;
-    }
-
-    function parsePrice(text) {
-        var m = String(text || '').match(/(\d+(?:[.,]\d+)?)\s*(?:dh|mad|dhs)/i);
-        return m ? parseFloat(m[1].replace(',', '.')) : null;
-    }
-
-    function shuffle(arr) {
-        var a = arr.slice();
-        for (var i = a.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var t = a[i]; a[i] = a[j]; a[j] = t;
-        }
-        return a;
-    }
-
+    function hasAny(h, words) { for (var i = 0; i < words.length; i++) if (h.indexOf(words[i]) !== -1) return true; return false; }
+    function parsePrice(t) { var m = String(t || '').match(/(\d+(?:[.,]\d+)?)\s*(?:dh|mad|dhs)/i); return m ? parseFloat(m[1].replace(',', '.')) : null; }
+    function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    function weightOf(it) { return it.video ? 2 : 1; }
     function pickWeighted(list) {
         var total = 0, i;
         for (i = 0; i < list.length; i++) total += weightOf(list[i]);
         var r = Math.random() * total;
-        for (i = 0; i < list.length; i++) {
-            r -= weightOf(list[i]);
-            if (r <= 0) return list[i];
-        }
+        for (i = 0; i < list.length; i++) { r -= weightOf(list[i]); if (r <= 0) return list[i]; }
         return list[list.length - 1];
-    }
-
-    /* Léger bonus aux plats qui ont une vidéo : le résultat est plus beau. */
-    function weightOf(item) {
-        return item.video ? 2 : 1;
     }
 
     /* --------------------------------------------------- Lecture du DOM --- */
@@ -327,150 +291,107 @@ document.addEventListener('DOMContentLoaded', () => {
     function sectionMeta(section) {
         var id = section.id || '';
         if (SECTION_META[id]) return SECTION_META[id];
-
         var title = normalize((section.querySelector('.section-header h2') || {}).textContent);
-        var kind = hasAny(title, DRINK_HINTS) ? 'drink'
-                 : hasAny(title, DESSERT_HINTS) ? 'dessert'
-                 : null;
-        return { label: (section.querySelector('.section-header h2') || {}).textContent || 'La carte',
-                 kind: kind,
-                 meals: kind ? [] : ['breakfast', 'lunch', 'dinner'] };
+        var kind = hasAny(title, DRINK_HINTS) ? 'drink' : hasAny(title, DESSERT_HINTS) ? 'dessert' : null;
+        return { label: (section.querySelector('.section-header h2') || {}).textContent || 'La carte', kind: kind, meals: kind ? [] : ['breakfast', 'lunch', 'dinner'] };
     }
 
     function readMedia(card) {
-        var video  = card.querySelector('video');
+        var video = card.querySelector('video');
         var source = card.querySelector('source');
-        var src = (source && (source.getAttribute('data-src') || source.getAttribute('src'))) ||
-                  (video && video.getAttribute('src')) || '';
-        return {
-            video:  src || null,
-            poster: (video && video.getAttribute('poster')) || null
-        };
+        var src = (source && (source.getAttribute('data-src') || source.getAttribute('src'))) || (video && video.getAttribute('src')) || '';
+        return { video: src || null, poster: (video && video.getAttribute('poster')) || null };
     }
 
     function buildMenuItem(card, section) {
         var h3 = card.querySelector('h3');
         if (!h3) return null;
-
-        var name  = h3.textContent.trim();
-        var pEl   = card.querySelector('p');
+        var name = h3.textContent.trim();
+        var pEl = card.querySelector('p');
         var pText = pEl ? pEl.textContent.trim() : '';
-        /* Dans les cartes compactes, le <p> contient juste le prix ("50 Dh") */
         var priceOnly = /^\s*\d+(?:[.,]\d+)?\s*dh\s*$/i.test(pText);
-
-        var price = parsePrice((card.querySelector('.price') || {}).textContent) ||
-                    (priceOnly ? parsePrice(pText) : null);
-
+        var price = parsePrice((card.querySelector('.price') || {}).textContent) || (priceOnly ? parsePrice(pText) : null);
         var media = readMedia(card);
-
-        return {
-            id:          name + '|' + section.id,
-            name:        name,
-            price:       price,
-            description: priceOnly ? '' : pText,
-            badge:       (card.querySelector('.card-badge') || {}).textContent || '',
-            sectionId:   section.id,
-            el:          card,
-            video:       media.video,
-            poster:      media.poster
-        };
-    }
-
-    function buildPopularItem(card, section) {
-        var base = buildMenuItem(card, section);
-        if (!base) return null;
-        var desc = card.getAttribute('data-description');
-        if (desc) base.description = desc.trim();
-        var badge = card.querySelector('.card-badge');
-        base.badge = badge ? badge.textContent.trim() : '';
-        return base;
+        return { id: name + '|' + section.id, name: name, price: price, description: priceOnly ? '' : pText,
+                 badge: (card.querySelector('.card-badge') || {}).textContent || '', sectionId: section.id,
+                 el: card, video: media.video, poster: media.poster };
     }
 
     function classify(item, meta) {
         var n = normalize(item.name);
-
-        if (meta.kind === 'drink')   return 'drink';
+        if (meta.kind === 'drink') return 'drink';
         if (meta.kind === 'dessert') return 'dessert';
-        if (hasAny(n, SIDE_WORDS))   return 'side';
-
-        /* Filet de sécurité : un article très bon marché d'une carte salée
-           est un accompagnement, pas un plat. */
+        if (hasAny(n, SIDE_WORDS)) return 'side';
         if (item.price !== null && item.price < MIN_MAIN_PRICE) return 'side';
-
         return 'main';
     }
-
     function flavor(item) {
         var n = normalize(item.name);
         if (hasAny(n, SAVORY_WORDS)) return 'savory';
-        if (hasAny(n, SWEET_WORDS))  return 'sweet';
+        if (hasAny(n, SWEET_WORDS)) return 'sweet';
         return 'neutral';
     }
-
+    function finishItem(item, meta, meals) {
+        item.kind = classify(item, meta);
+        item.flavor = flavor(item);
+        item.sectionName = meta.label;
+        item.meals = item.kind === 'main' ? meals : (meta.meals || []);
+    }
     function collectMenu() {
         var items = [];
-        var sections = document.querySelectorAll('main .menu-section');
-
-        Array.prototype.forEach.call(sections, function (section) {
-            if (section.id === 'roulette') return;
-
+        Array.prototype.forEach.call(document.querySelectorAll('main .menu-section'), function (section) {
             var meta = sectionMeta(section);
             var meals = meta.meals || [];
-
             Array.prototype.forEach.call(section.querySelectorAll('.popular-card'), function (card) {
-                var item = buildPopularItem(card, section);
+                var item = buildMenuItem(card, section);
                 if (!item) return;
-                finishItem(item, meta, meals);
-                items.push(item);
+                var desc = card.getAttribute('data-description'); if (desc) item.description = desc.trim();
+                var badge = card.querySelector('.card-badge'); item.badge = badge ? badge.textContent.trim() : '';
+                finishItem(item, meta, meals); items.push(item);
             });
-
             Array.prototype.forEach.call(section.querySelectorAll('.menu-item-card'), function (card) {
                 var item = buildMenuItem(card, section);
                 if (!item) return;
-                finishItem(item, meta, meals);
-                items.push(item);
+                finishItem(item, meta, meals); items.push(item);
             });
         });
-
         return items;
     }
-
-    function finishItem(item, meta, meals) {
-        item.kind        = classify(item, meta);
-        item.flavor      = flavor(item);
-        item.sectionName = meta.label;
-        item.meals       = item.kind === 'main' ? meals : (meta.meals || []);
-    }
-
-    /* -------------------------------------------------- Filtrage du tirage --- */
-
     function candidatesFor(period) {
-        return MENU.filter(function (item) {
-            if (item.kind !== 'main') return false;              // ni jus, ni dessert
-            if (item.meals.indexOf(period) === -1) return false; // bon service
-            /* À midi on reste sur du salé : pas de brioche perdue au caramel
-               comme plat principal. Le dîner, lui, accepte la touche sucrée. */
-            if (period === 'lunch' && item.flavor === 'sweet') return false;
+        return MENU.filter(function (it) {
+            if (it.kind !== 'main') return false;
+            if (it.meals.indexOf(period) === -1) return false;
+            if (period === 'lunch' && it.flavor === 'sweet') return false;
             return true;
         });
-    }
-
-    function drinkFor(period) {
-        var drinks = MENU.filter(function (item) {
-            return item.kind === 'drink' && item.meals.indexOf(period) !== -1;
-        });
-        return drinks.length ? drinks[Math.floor(Math.random() * drinks.length)] : null;
     }
 
     /* ---------------------------------------------------------------- DOM --- */
 
     var MENU = [];
-    var canvas, ctx, frame, hub, spinBtn, hintEl;
-    var chips, reel, reelText, resultCard;
-    var resultTitle, resultPrice, resultOrigin, resultDesc, resultKicker, resultPairing;
-    var resultMedia, resultVideo, resultMediaLabel, locateBtn, respinBtn;
+    var state = {
+        mode: null,               // 'solo' | 'group'
+        period: 'lunch',
+        groupSize: 2,
+        players: [],              // [{name, dish, confirmed}]
+        current: 0,
+        takenIds: [],             // plats déjà validés à la table
+        payersNeeded: 1,
+        payers: [],
+        screen: 'mode'
+    };
 
-    var currentPeriod = 'lunch';
+    var canvas, ctx, frame, hub, wheelShell;
+    var modal, fab, closeBtn;
+    var spinBtn, paySpinBtn, hintEl, turnInfo;
+    var reel, reelText, resultCard;
+    var resultTitle, resultPrice, resultOrigin, resultDesc, resultKicker;
+    var resultMedia, resultVideo, resultMediaLabel;
+    var actRespin, actValidate;
+    var gsMinus, gsPlus, gsValue, gsStart;
+    var sumList, sumTotal, sumPay, sumRestart;
+    var payNames, payCount, payResult;
+
     var pool = [];
     var slices = [];
     var winner = null;
@@ -478,123 +399,235 @@ document.addEventListener('DOMContentLoaded', () => {
     var spinning = false;
     var radius = 0;
     var reelTimer = null;
+    var onEnd = null;
+    var wheelKind = 'dish';
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function $(id) { return document.getElementById(id); }
 
     function init() {
-        canvas   = $('wheel-canvas');
-        frame    = document.querySelector('.wheel-frame');
-        hub      = $('wheel-hub');
-        spinBtn  = $('spin-btn');
-        hintEl   = $('roulette-hint');
-        chips    = document.querySelectorAll('.period-chip');
-        reel     = $('result-reel');
+        canvas = $('wheel-canvas');
+        frame = document.querySelector('.wheel-frame');
+        hub = $('wheel-hub');
+        wheelShell = $('wheel-shell');
+        modal = $('roulette-modal');
+        fab = $('roulette-fab');
+        closeBtn = $('rm-close');
+        spinBtn = $('spin-btn');
+        paySpinBtn = $('pay-spin');
+        hintEl = $('roulette-hint');
+        turnInfo = $('rm-turn-info');
+        reel = $('result-reel');
         reelText = $('result-reel-text');
         resultCard = $('result-card');
-
-        resultTitle   = $('result-title');
-        resultPrice   = $('result-price');
-        resultOrigin  = $('result-origin');
-        resultDesc    = $('result-desc');
-        resultKicker  = $('result-kicker');
-        resultPairing = $('result-pairing');
-        resultMedia   = $('result-media');
-        resultVideo   = $('result-video');
+        resultTitle = $('result-title');
+        resultPrice = $('result-price');
+        resultOrigin = $('result-origin');
+        resultDesc = $('result-desc');
+        resultKicker = $('result-kicker');
+        resultMedia = $('result-media');
+        resultVideo = $('result-video');
         resultMediaLabel = $('result-media-label');
-        locateBtn     = $('result-locate');
-        respinBtn     = $('result-respin');
+        actRespin = $('act-respin');
+        actValidate = $('act-validate');
+        gsMinus = $('gs-minus');
+        gsPlus = $('gs-plus');
+        gsValue = $('gs-value');
+        gsStart = $('gs-start');
+        sumList = $('sum-list');
+        sumTotal = $('sum-total');
+        sumPay = $('sum-pay');
+        sumRestart = $('sum-restart');
+        payNames = $('pay-names');
+        payCount = $('pay-count');
+        payResult = $('pay-result');
 
-        if (!canvas || !spinBtn) return;          // section absente : on ne fait rien
+        if (!canvas || !modal || !fab) return;
         ctx = canvas.getContext('2d');
-
         MENU = collectMenu();
 
-        /* Service sélectionné d'après l'heure du visiteur */
         var h = new Date().getHours();
-        currentPeriod = h < 11 ? 'breakfast' : (h < 17 ? 'lunch' : 'dinner');
+        state.period = h < 11 ? 'breakfast' : (h < 17 ? 'lunch' : 'dinner');
 
         bindEvents();
-        setPeriod(currentPeriod, true);
-        sizeCanvas();
+        syncPeriodChips();
 
         window.addEventListener('resize', debounce(sizeCanvas, 180));
-
-        /* Redessin au changement de thème (les couleurs viennent du CSS).
-           Enregistré AVANT le ResizeObserver : rien ne doit pouvoir l'empêcher. */
+        if (typeof window.ResizeObserver === 'function') {
+            new ResizeObserver(debounce(sizeCanvas, 120)).observe(frame);
+        }
         if (typeof MutationObserver === 'function') {
             new MutationObserver(function () { draw(); })
                 .observe(document.body, { attributes: true, attributeFilter: ['class'] });
         }
-
-        if (typeof window.ResizeObserver === 'function') {
-            new ResizeObserver(debounce(sizeCanvas, 120)).observe(frame);
-        }
-
-        /* Une fois la webfont Lato chargée, on redessine pour des libellés nets */
         if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
             document.fonts.ready.then(function () { draw(); }).catch(function () {});
         }
     }
 
-    function debounce(fn, ms) {
-        var t;
-        return function () {
-            clearTimeout(t);
-            t = setTimeout(fn, ms);
-        };
-    }
+    function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+
+    /* --------------------------------------------------------- Événements --- */
 
     function bindEvents() {
-        Array.prototype.forEach.call(chips, function (chip) {
-            chip.addEventListener('click', function () {
-                if (spinning) return;
-                setPeriod(chip.getAttribute('data-period'));
+        fab.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+        Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
+            b.addEventListener('click', function () { chooseMode(b.getAttribute('data-mode')); });
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function (c) {
+            c.addEventListener('click', function () { if (!spinning) setPeriod(c.getAttribute('data-period')); });
+        });
+
+        gsMinus.addEventListener('click', function () { setGroupSize(state.groupSize - 1); });
+        gsPlus.addEventListener('click', function () { setGroupSize(state.groupSize + 1); });
+        gsStart.addEventListener('click', startGroup);
+
+        spinBtn.addEventListener('click', function () { spinDish(false); });
+        hub.addEventListener('click', function () { spinDish(false); });
+        actRespin.addEventListener('click', function () { spinDish(true); });
+        actValidate.addEventListener('click', validateCurrent);
+
+        sumPay.addEventListener('click', openPay);
+        sumRestart.addEventListener('click', function () { resetTable(); showScreen('mode'); });
+
+        Array.prototype.forEach.call(payCount.querySelectorAll('.paycount-btn'), function (b) {
+            b.addEventListener('click', function () {
+                state.payersNeeded = parseInt(b.getAttribute('data-count'), 10) || 1;
+                Array.prototype.forEach.call(payCount.querySelectorAll('.paycount-btn'), function (x) {
+                    x.classList.toggle('is-active', x === b);
+                });
             });
         });
+        paySpinBtn.addEventListener('click', spinPay);
 
-        spinBtn.addEventListener('click', spin);
-        hub.addEventListener('click', spin);
-        respinBtn.addEventListener('click', spin);
-        locateBtn.addEventListener('click', locateInMenu);
-
-        resultVideo.addEventListener('error', function () {
-            resultMedia.classList.remove('has-video');
-        });
+        resultVideo.addEventListener('error', function () { resultMedia.classList.remove('has-video'); });
     }
 
-    function setPeriod(period, initial) {
-        if (!PERIODS[period]) return;
-        currentPeriod = period;
+    /* ------------------------------------------------------ Ouverture modal --- */
 
-        Array.prototype.forEach.call(chips, function (chip) {
-            chip.classList.toggle('active', chip.getAttribute('data-period') === period);
-            chip.setAttribute('aria-pressed', chip.getAttribute('data-period') === period ? 'true' : 'false');
+    function openModal() {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        showScreen(state.mode ? state.screen : 'mode');
+        setTimeout(sizeCanvas, 60);
+    }
+    function closeModal() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+        if (resultVideo) { resultVideo.pause(); }
+    }
+
+    function showScreen(name) {
+        state.screen = name;
+        Array.prototype.forEach.call(document.querySelectorAll('.rm-screen'), function (s) {
+            s.classList.toggle('is-active', s.getAttribute('data-screen') === name);
         });
+        var showWheel = (name === 'play' || name === 'pay');
+        wheelShell.classList.toggle('show', showWheel);
+        if (showWheel) setTimeout(sizeCanvas, 40);
+        if (name !== 'play') { hideResult(); }
+    }
 
-        pool = candidatesFor(period);
-        slices = buildSlices();
-
-        hintEl.textContent = pool.length + ' plats en jeu · Service : ' + PERIODS[period].label;
-
-        if (!initial) {
-            hideResult();
-            reelText.textContent = pool.length + ' plats en jeu';
+    function chooseMode(mode) {
+        state.mode = mode;
+        if (mode === 'solo') {
+            startSolo();
+        } else {
+            showScreen('groupsize');
         }
-        rotation = 0;
-        draw();
     }
 
-    /* ------------------------------------------------- Construction roue --- */
+    function setGroupSize(n) {
+        state.groupSize = Math.max(MIN_GROUP, Math.min(MAX_GROUP, n));
+        gsValue.textContent = state.groupSize;
+    }
 
-    /* La roue affiche un échantillon lisible de la carte. Le gagnant est tiré
-       sur TOUTE la sélection, puis placé parmi les tranches : la roue et le
-       résultat tombent donc toujours d'accord, et chaque lancer est différent. */
+    function startSolo() {
+        resetTable();
+        state.mode = 'solo';
+        state.players = [{ name: 'Vous', dish: null, confirmed: false }];
+        state.current = 0;
+        enterPlay();
+    }
+
+    function startGroup() {
+        resetTable();
+        state.mode = 'group';
+        state.players = [];
+        for (var i = 0; i < state.groupSize; i++) {
+            state.players.push({ name: 'Joueur ' + (i + 1), dish: null, confirmed: false });
+        }
+        state.current = 0;
+        enterPlay();
+    }
+
+    function resetTable() {
+        state.players = [];
+        state.current = 0;
+        state.takenIds = [];
+        state.payers = [];
+    }
+
+    function enterPlay() {
+        hideResult();
+        showScreen('play');
+        updateTurnInfo();
+    }
+
+    function updateTurnInfo() {
+        if (state.mode === 'solo') {
+            turnInfo.innerHTML = 'À vous de jouer&nbsp;!';
+        } else {
+            var p = state.players[state.current];
+            turnInfo.innerHTML = 'Tour de <strong>' + esc(p.name) + '</strong> · ' + (state.current + 1) + '/' + state.players.length;
+        }
+    }
+
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    /* ------------------------------------------------------ Période / pool --- */
+
+    function setPeriod(p) {
+        if (!PERIODS[p]) return;
+        state.period = p;
+        syncPeriodChips();
+        updateHint();
+    }
+    function syncPeriodChips() {
+        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function (c) {
+            c.classList.toggle('active', c.getAttribute('data-period') === state.period);
+        });
+        updateHint();
+    }
+    function updateHint() {
+        if (hintEl) hintEl.textContent = candidatesFor(state.period).length + ' plats en jeu · ' + PERIODS[state.period].label;
+    }
+
+    function availableDishes(excludeCurrent) {
+        var base = candidatesFor(state.period).filter(function (it) {
+            return state.takenIds.indexOf(it.id) === -1;
+        });
+        if (excludeCurrent && winner && winner.kind === 'main') {
+            base = base.filter(function (it) { return it.id !== winner.id; });
+        }
+        /* Si la table a presque tout pris, on ré-ouvre la carte pour ne pas bloquer */
+        return base.length >= 2 ? base : candidatesFor(state.period);
+    }
+
+    /* ------------------------------------------------------------- La roue --- */
+
     function buildSlices(win) {
         if (!pool.length) return [];
         var n = Math.min(SLICE_COUNT, pool.length);
         if (!win) return shuffle(pool).slice(0, n);
-
         var rest = shuffle(pool.filter(function (x) { return x !== win; })).slice(0, n - 1);
         return shuffle([win].concat(rest));
     }
@@ -604,10 +637,9 @@ document.addEventListener('DOMContentLoaded', () => {
         var css = frame.clientWidth;
         if (!css) return;
         var dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-        canvas.width  = Math.round(css * dpr);
+        canvas.width = Math.round(css * dpr);
         canvas.height = Math.round(css * dpr);
-        canvas.style.width  = css + 'px';
+        canvas.style.width = css + 'px';
         canvas.style.height = css + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         radius = css / 2;
@@ -616,55 +648,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function palette() {
         var cs = getComputedStyle(document.body);
-        function v(name, fallback) {
-            var val = cs.getPropertyValue(name);
-            return (val && val.trim()) || fallback;
-        }
-        return {
-            sliceA: v('--wheel-slice-a', '#F7F1E8'),
-            sliceB: v('--wheel-slice-b', '#C8956C'),
-            inkA:   v('--wheel-ink-a', '#1A1A1A'),
-            inkB:   v('--wheel-ink-b', '#241708'),
-            rim:    v('--wheel-rim', '#1A1A1A'),
-            accent: v('--accent', '#C8956C')
-        };
+        function v(name, fb) { var val = cs.getPropertyValue(name); return (val && val.trim()) || fb; }
+        return { sliceA: v('--wheel-slice-a', '#F7F1E8'), sliceB: v('--wheel-slice-b', '#C8956C'),
+                 inkA: v('--wheel-ink-a', '#1A1A1A'), inkB: v('--wheel-ink-b', '#241708'),
+                 rim: v('--wheel-rim', '#1A1A1A'), accent: v('--accent', '#C8956C') };
     }
-
-    function shortLabel(name) {
-        return name.length > 24 ? name.slice(0, 22).trim() + '…' : name;
-    }
+    function shortLabel(n) { return n.length > 24 ? n.slice(0, 22).trim() + '…' : n; }
 
     function wrapText(text, maxWidth, maxLines) {
         var words = String(text).split(' ');
-        var lines = [];
-        var line = '';
-        var overflow = false;
-
+        var lines = []; var line = ''; var overflow = false;
         for (var i = 0; i < words.length; i++) {
             var test = line ? line + ' ' + words[i] : words[i];
-            if (!line || ctx.measureText(test).width <= maxWidth) {
-                line = test;
-                continue;
-            }
-            if (lines.length < maxLines - 1) {
-                lines.push(line);
-                line = words[i];
-            } else {
-                /* plus de place : on empile la fin, elle sera tronquée */
-                line = line + ' ' + words.slice(i).join(' ');
-                overflow = true;
-                break;
-            }
+            if (!line || ctx.measureText(test).width <= maxWidth) { line = test; continue; }
+            if (lines.length < maxLines - 1) { lines.push(line); line = words[i]; }
+            else { line = line + ' ' + words.slice(i).join(' '); overflow = true; break; }
         }
         if (line) lines.push(line);
-
         var lastIdx = lines.length - 1;
         var last = lines[lastIdx] || '';
         if (overflow || ctx.measureText(last).width > maxWidth) {
             var cut = last;
-            while (cut.length > 1 && ctx.measureText(cut + '…').width > maxWidth) {
-                cut = cut.slice(0, -1).trim();
-            }
+            while (cut.length > 1 && ctx.measureText(cut + '…').width > maxWidth) cut = cut.slice(0, -1).trim();
             lines[lastIdx] = cut + '…';
         }
         return lines;
@@ -672,86 +677,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function draw() {
         if (!ctx || !radius || !slices.length) return;
-
-        var c   = palette();
-        var R   = radius;
-        var rIn = R * 0.9;
-        var n   = slices.length;
-        var step = (Math.PI * 2) / n;
-
+        var c = palette();
+        var R = radius, rIn = R * 0.9, n = slices.length, step = (Math.PI * 2) / n;
         ctx.clearRect(0, 0, R * 2, R * 2);
-        ctx.save();
-        ctx.translate(R, R);
-        ctx.rotate(rotation * Math.PI / 180);
+        ctx.save(); ctx.translate(R, R); ctx.rotate(rotation * Math.PI / 180);
 
-        /* Jante extérieure */
-        ctx.beginPath();
-        ctx.arc(0, 0, R, 0, Math.PI * 2);
-        ctx.fillStyle = c.rim;
-        ctx.fill();
-
-        /* Clous dorés sur la jante */
+        ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = c.rim; ctx.fill();
         var studs = Math.max(16, n * 2);
         for (var s = 0; s < studs; s++) {
             var a = (s / studs) * Math.PI * 2;
-            ctx.beginPath();
-            ctx.arc(Math.cos(a) * R * 0.952, Math.sin(a) * R * 0.952, R * 0.012, 0, Math.PI * 2);
-            ctx.fillStyle = s % 2 === 0 ? c.accent : 'rgba(255,255,255,0.55)';
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(Math.cos(a) * R * 0.952, Math.sin(a) * R * 0.952, R * 0.012, 0, Math.PI * 2);
+            ctx.fillStyle = s % 2 === 0 ? c.accent : 'rgba(255,255,255,0.55)'; ctx.fill();
         }
-
-        /* Tranches */
         for (var i = 0; i < n; i++) {
-            var a0 = -Math.PI / 2 + i * step;
-            var a1 = a0 + step;
-            var light = i % 2 === 0;
+            var a0 = -Math.PI / 2 + i * step, a1 = a0 + step, light = i % 2 === 0;
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, rIn, a0, a1); ctx.closePath();
+            ctx.fillStyle = light ? c.sliceA : c.sliceB; ctx.fill();
+            ctx.lineWidth = Math.max(1, R * 0.006); ctx.strokeStyle = 'rgba(200,149,108,0.55)'; ctx.stroke();
 
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.arc(0, 0, rIn, a0, a1);
-            ctx.closePath();
-            ctx.fillStyle = light ? c.sliceA : c.sliceB;
-            ctx.fill();
-            ctx.lineWidth = Math.max(1, R * 0.006);
-            ctx.strokeStyle = 'rgba(200,149,108,0.55)';
-            ctx.stroke();
-
-            /* Libellé */
-            var mid = a0 + step / 2;
-            var fs  = Math.max(9, Math.min(R * 0.088, 15));
-            ctx.save();
-            ctx.rotate(mid);
+            var mid = a0 + step / 2, fs = Math.max(9, Math.min(R * 0.088, 15));
+            ctx.save(); ctx.rotate(mid);
             var flip = Math.cos(mid) < 0;
             if (flip) ctx.rotate(Math.PI);
             ctx.textAlign = flip ? 'left' : 'right';
             ctx.textBaseline = 'middle';
             ctx.font = '700 ' + fs.toFixed(1) + 'px Lato, sans-serif';
             ctx.fillStyle = light ? c.inkA : c.inkB;
-
-            var pad = R * 0.075;
-            var x = flip ? -(rIn - pad) : (rIn - pad);
-            /* largeur bornée pour ne pas glisser sous le moyeu central */
+            var pad = R * 0.075, x = flip ? -(rIn - pad) : (rIn - pad);
             var lines = wrapText(shortLabel(slices[i].name), R * 0.5, 3);
-            var lineH = fs * 1.18;
-            var y0 = -((lines.length - 1) * lineH) / 2;
-            for (var l = 0; l < lines.length; l++) {
-                ctx.fillText(lines[l], x, y0 + l * lineH);
-            }
+            var lineH = fs * 1.18, y0 = -((lines.length - 1) * lineH) / 2;
+            for (var l = 0; l < lines.length; l++) ctx.fillText(lines[l], x, y0 + l * lineH);
             ctx.restore();
         }
-
-        /* Liseré intérieur + ombre sous le moyeu */
-        ctx.beginPath();
-        ctx.arc(0, 0, rIn, 0, Math.PI * 2);
-        ctx.lineWidth = Math.max(2, R * 0.014);
-        ctx.strokeStyle = c.accent;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(0, 0, R * 0.19, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,0.18)';
-        ctx.fill();
-
+        ctx.beginPath(); ctx.arc(0, 0, rIn, 0, Math.PI * 2);
+        ctx.lineWidth = Math.max(2, R * 0.014); ctx.strokeStyle = c.accent; ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, 0, R * 0.19, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fill();
         ctx.restore();
     }
 
@@ -762,103 +722,88 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.floor(a / step) % slices.length;
     }
 
-    /* -------------------------------------------------------------- Spin --- */
+    function setSpinDisabled(dis) {
+        if (spinBtn) spinBtn.disabled = dis;
+        if (paySpinBtn) paySpinBtn.disabled = dis;
+    }
 
-    function spin() {
-        if (spinning) return;
-        if (!pool.length) {
-            hintEl.textContent = 'Aucun plat disponible pour ce service.';
-            return;
-        }
-
+    function beginSpin(list, kind, endFn) {
+        if (spinning || !list.length) return;
         spinning = true;
-        spinBtn.disabled = true;
+        setSpinDisabled(true);
+        wheelKind = kind;
+        onEnd = endFn;
+        pool = list;
         resultCard.classList.remove('visible');
-        reel.classList.remove('hidden');
-        reelText.textContent = '…';
-        startReel();
 
-        winner = pickWeighted(pool);
+        if (kind === 'dish') { reel.classList.remove('hidden'); startReel(list); }
+        else { reel.classList.add('hidden'); }
+
+        winner = pickWeighted(list);
         slices = buildSlices(winner);
-        var winIndex = slices.indexOf(winner);
         draw();
 
-        var step   = 360 / slices.length;
+        var step = 360 / slices.length;
         var jitter = (Math.random() * 0.6 - 0.3) * step;
+        var winIndex = slices.indexOf(winner);
         var target = -((winIndex + 0.5) * step) - jitter;
-
         var current = ((rotation % 360) + 360) % 360;
-        var delta   = (((target - current) % 360) + 360) % 360;
-        var total   = 360 * FULL_TURNS + delta;
-
-        animateTo(rotation + total);
+        var delta = (((target - current) % 360) + 360) % 360;
+        animateTo(rotation + 360 * FULL_TURNS + delta);
     }
 
     function animateTo(target) {
-        var from     = rotation;
-        var distance = target - from;
+        var from = rotation, distance = target - from;
         var duration = reduced ? SPIN_MS_REDUCED : SPIN_MS;
-        var start    = performance.now();
-        var lastIdx  = sliceIndexAtPointer();
-        var pointer  = document.querySelector('.wheel-pointer');
-
-        function frameStep(now) {
+        var start = performance.now();
+        var lastIdx = sliceIndexAtPointer();
+        var pointer = document.querySelector('.wheel-pointer');
+        function step(now) {
             var p = Math.min(1, (now - start) / duration);
-            var e = 1 - Math.pow(1 - p, 4);          // easeOutQuart
+            var e = 1 - Math.pow(1 - p, 4);
             rotation = from + distance * e;
             draw();
-
             var idx = sliceIndexAtPointer();
             if (idx !== lastIdx) {
                 lastIdx = idx;
-                if (pointer) {
-                    pointer.classList.remove('tick');
-                    void pointer.offsetWidth;
-                    pointer.classList.add('tick');
-                }
+                if (pointer) { pointer.classList.remove('tick'); void pointer.offsetWidth; pointer.classList.add('tick'); }
                 if (navigator.vibrate && !reduced) navigator.vibrate(6);
             }
-
-            if (p < 1) {
-                requestAnimationFrame(frameStep);
-            } else {
-                rotation = target;
-                draw();
-                finishSpin();
-            }
+            if (p < 1) requestAnimationFrame(step);
+            else { rotation = target; draw(); finishSpin(); }
         }
-        requestAnimationFrame(frameStep);
+        requestAnimationFrame(step);
     }
 
-    function startReel() {
+    function startReel(list) {
         stopReel();
         if (reduced) return;
-        var i = 0;
         reelTimer = setInterval(function () {
-            var item = pool[Math.floor(Math.random() * pool.length)];
-            reelText.textContent = item.name;
-            reelText.classList.remove('rolling');
-            void reelText.offsetWidth;
-            reelText.classList.add('rolling');
-            i++;
+            var it = list[Math.floor(Math.random() * list.length)];
+            reelText.textContent = it.name;
+            reelText.classList.remove('rolling'); void reelText.offsetWidth; reelText.classList.add('rolling');
         }, 95);
     }
-
-    function stopReel() {
-        if (reelTimer) {
-            clearInterval(reelTimer);
-            reelTimer = null;
-        }
-    }
+    function stopReel() { if (reelTimer) { clearInterval(reelTimer); reelTimer = null; } }
 
     function finishSpin() {
         stopReel();
         spinning = false;
-        spinBtn.disabled = false;
-        if (!winner) return;
+        setSpinDisabled(false);
+        if (onEnd) onEnd(winner);
+    }
 
+    /* ------------------------------------------------------- Spin des plats --- */
+
+    function spinDish(isRespin) {
+        if (state.screen !== 'play') return;
+        var list = availableDishes(isRespin);
+        beginSpin(list, 'dish', onDishLand);
+    }
+
+    function onDishLand(item) {
         reel.classList.add('hidden');
-        showResult(winner);
+        showDishResult(item);
         if (navigator.vibrate && !reduced) navigator.vibrate([18, 60, 24]);
     }
 
@@ -866,24 +811,16 @@ document.addEventListener('DOMContentLoaded', () => {
         resultCard.classList.remove('visible');
         reel.classList.remove('hidden');
         reelText.textContent = 'Prêt à tourner la roue';
-        if (resultVideo) {
-            resultVideo.pause();
-            resultVideo.removeAttribute('src');
-            resultVideo.load();
-        }
+        if (resultVideo) { resultVideo.pause(); resultVideo.removeAttribute('src'); resultVideo.load(); }
         resultMedia.classList.remove('has-video');
     }
 
-    function showResult(item) {
-        var period = PERIODS[currentPeriod];
-
-        resultKicker.textContent  = 'Votre ' + period.short + ' : le hasard a choisi';
-        resultTitle.textContent   = item.name;
-        resultPrice.textContent   = item.price !== null ? item.price + ' Dh' : '';
-        resultOrigin.textContent  = item.sectionName;
-        /* Certains plats de la carte n'ont pas de description : on retombe
-           toujours sur une phrase utile plutôt que sur un bloc vide. */
-        resultDesc.textContent    = item.description || (item.badge
+    function showDishResult(item) {
+        resultKicker.textContent = 'Le hasard a choisi';
+        resultTitle.textContent = item.name;
+        resultPrice.textContent = item.price !== null ? item.price + ' Dh' : '';
+        resultOrigin.textContent = item.sectionName;
+        resultDesc.textContent = item.description || (item.badge
             ? 'Incontournable de la carte — ' + item.badge + '.'
             : 'À retrouver dans notre carte ' + item.sectionName + '.');
         resultMediaLabel.textContent = item.sectionName;
@@ -894,56 +831,157 @@ document.addEventListener('DOMContentLoaded', () => {
             resultVideo.src = item.video;
             resultVideo.load();
             var p = resultVideo.play();
-            if (p && p.catch) p.catch(function () { /* lecture bloquée : l'affiche suffit */ });
+            if (p && p.catch) p.catch(function () {});
         } else {
             resultMedia.classList.remove('has-video');
-            resultVideo.pause();
-            resultVideo.removeAttribute('src');
-            resultVideo.load();
+            resultVideo.pause(); resultVideo.removeAttribute('src'); resultVideo.load();
         }
 
-        var drink = drinkFor(currentPeriod);
-        resultPairing.textContent = drink
-            ? 'Pour accompagner : ' + drink.name + (drink.price !== null ? ' — ' + drink.price + ' Dh' : '')
-            : '';
+        actValidate.innerHTML = state.mode === 'group'
+            ? '<i class="fas fa-check"></i> Valider &amp; Suivant'
+            : '<i class="fas fa-check"></i> C\'est choisi !';
 
-        /* Remontage de l'animation d'apparition */
-        resultCard.classList.remove('visible');
-        void resultCard.offsetWidth;
-        resultCard.classList.add('visible');
+        resultCard.classList.remove('visible'); void resultCard.offsetWidth; resultCard.classList.add('visible');
     }
 
-    function locateInMenu() {
-        if (!winner || !winner.el) return;
-        winner.el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
-        winner.el.classList.remove('roulette-flash');
-        void winner.el.offsetWidth;
-        winner.el.classList.add('roulette-flash');
-        setTimeout(function () {
-            if (winner && winner.el) winner.el.classList.remove('roulette-flash');
-        }, 2600);
+    function validateCurrent() {
+        if (!winner || winner.kind !== 'main') return;
+        if (state.mode === 'solo') { closeModal(); return; }
+
+        var player = state.players[state.current];
+        player.dish = winner;
+        player.confirmed = true;
+        if (state.takenIds.indexOf(winner.id) === -1) state.takenIds.push(winner.id);
+        state.current++;
+
+        if (state.current < state.players.length) {
+            hideResult();
+            updateTurnInfo();
+        } else {
+            buildSummary();
+            showScreen('summary');
+        }
     }
 
-    /* ------------------------------------------------------------- Démarrage */
+    /* ---------------------------------------------------------- Résumé table --- */
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+    function tableTotal() {
+        var t = 0;
+        state.players.forEach(function (p) { if (p.dish && p.dish.price !== null) t += p.dish.price; });
+        return t;
     }
 
-    /* Exposé pour les tests / la console (non utilisé par la page) */
+    function buildSummary() {
+        sumList.innerHTML = '';
+        state.players.forEach(function (p, i) {
+            var li = document.createElement('li');
+            li.style.animationDelay = (i * 0.08) + 's';
+            var price = p.dish && p.dish.price !== null ? p.dish.price + ' Dh' : '—';
+            li.innerHTML = '<span class="sum-player">' + esc(p.name) + '</span>' +
+                           '<span class="sum-dish">' + esc(p.dish ? p.dish.name : '—') + '</span>' +
+                           '<span class="sum-price">' + price + '</span>';
+            sumList.appendChild(li);
+        });
+        sumTotal.textContent = tableTotal() + ' Dh';
+    }
+
+    /* ------------------------------------------------------------- Qui paye --- */
+
+    function openPay() {
+        state.payers = [];
+        payResult.innerHTML = '';
+        buildPayNames();
+        showScreen('pay');
+    }
+
+    function buildPayNames() {
+        payNames.innerHTML = '';
+        state.players.forEach(function (p) {
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.value = p.name;
+            input.setAttribute('data-player', p.name);
+            input.setAttribute('aria-label', 'Nom du participant');
+            payNames.appendChild(input);
+        });
+    }
+
+    function currentNames() {
+        var names = [];
+        Array.prototype.forEach.call(payNames.querySelectorAll('input'), function (inp, i) {
+            var v = inp.value.trim() || ('Joueur ' + (i + 1));
+            names.push({ name: v, video: null });
+        });
+        return names;
+    }
+
+    function spinPay() {
+        if (state.screen !== 'pay') return;
+        var remaining = currentNames().filter(function (n) { return state.payers.indexOf(n.name) === -1; });
+        if (!remaining.length) return;
+        payResult.innerHTML = '<span>La roue tourne…</span>';
+        beginSpin(remaining, 'names', onNameLand);
+    }
+
+    function onNameLand(item) {
+        state.payers.push(item.name);
+        var need = Math.min(state.payersNeeded, currentNames().length);
+
+        if (state.payers.length < need) {
+            payResult.innerHTML = '<span class="win">' + esc(item.name) + '</span> paye… encore un tour&nbsp;!';
+            return;
+        }
+
+        var total = tableTotal();
+        var share = need > 0 ? Math.round(total / need) : total;
+        var msg = state.payers.length === 1
+            ? '<span class="win">' + esc(state.payers[0]) + '</span> paye l\'addition&nbsp;!'
+            : '<span class="win">' + esc(state.payers.join(' & ')) + '</span> se partagent l\'addition&nbsp;!';
+        payResult.innerHTML = msg + '<br><small>' + share + ' Dh / personne</small>';
+        confetti();
+        if (navigator.vibrate && !reduced) navigator.vibrate([30, 60, 30, 60, 60]);
+    }
+
+    function confetti() {
+        var host = payResult;
+        var colors = ['#C8956C', '#F7F1E8', '#2ECC71', '#E67E22', '#FFFFFF'];
+        for (var i = 0; i < 40; i++) {
+            var piece = document.createElement('span');
+            piece.className = 'confetti-piece';
+            piece.style.left = (Math.random() * 100) + '%';
+            piece.style.background = colors[i % colors.length];
+            piece.style.animationDuration = (1 + Math.random() * 1.4) + 's';
+            piece.style.animationDelay = (Math.random() * 0.3) + 's';
+            host.appendChild(piece);
+            (function (el) { setTimeout(function () { el.remove(); }, 3200); })(piece);
+        }
+    }
+
+    /* ------------------------------------------------------------- Démarrage --- */
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+
+    /* Exposé pour les tests / la console */
     window.LeManoirRoulette = {
-        get menu()        { return MENU; },
-        get pool()        { return pool; },
-        get slices()      { return slices; },
-        get period()      { return currentPeriod; },
-        get winner()      { return winner; },
-        get rotation()    { return rotation; },
-        get spinning()    { return spinning; },
+        get menu()     { return MENU; },
+        get state()    { return state; },
+        get pool()     { return pool; },
+        get slices()   { return slices; },
+        get winner()   { return winner; },
+        get rotation() { return rotation; },
+        get spinning() { return spinning; },
         pointerIndex:  sliceIndexAtPointer,
         candidatesFor: candidatesFor,
-        setPeriod:     setPeriod,
-        spin:          spin
+        open:          openModal,
+        close:         closeModal,
+        chooseMode:    chooseMode,
+        setGroupSize:  setGroupSize,
+        startGroup:    startGroup,
+        spinDish:      spinDish,
+        validate:      validateCurrent,
+        openPay:       openPay,
+        spinPay:       spinPay,
+        setPeriod:     setPeriod
     };
 })();
