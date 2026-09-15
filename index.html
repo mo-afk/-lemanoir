@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Manoir - Menu Digital</title>
+    <meta name="description" content="Découvrez le menu digital du restaurant Le Manoir. Petit-déjeuner, brunch, crêpes, desserts et boissons.">
+    <meta name="theme-color" content="#1A1A1A">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        video {
+            object-fit: cover;
+            background: #1a1a1a;
+        }
+        .lazy-video {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .lazy-video.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader-overlay">
+        <div class="loader-content">
+            <h1 class="loader-title"><span>L</span><span>e</span><span>&nbsp;</span><span>M</span><span>a</span><span>n</span><span>o</span><span>i</span><span>r</span></h1>
+            <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+        </div>
+    </div>
+
+    <header class="hero-section">
+        <div class="hero-slider">
+            <video src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video hero.webm" class="active" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/heroposter.jpg" autoplay muted loop playsinline></video>
+            <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/heroposter.jpg" muted loop playsinline preload="none">
+                <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video hero.webm" type="video/webm">
+            </video>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="logo-overlay">
+            <h1 class="animated-title">Le Manoir</h1>
+            <p class="hero-subtitle">Menu Digital</p>
+        </div>
+    </header>
+
+    <nav class="category-nav">
+        <div class="nav-container">
+            <button class="dark-mode-toggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+            <a href="#petit-dejeuner" class="nav-link active">Petit Déjeuner</a>
+            <a href="#brunch" class="nav-link">Brunch</a>
+            <a href="#sandwichs" class="nav-link">Sandwichs</a>
+            <a href="#specialites" class="nav-link">Spécialités</a>
+            <a href="#crepes" class="nav-link">Crêpes</a>
+            <a href="#desserts" class="nav-link">Desserts</a>
+            <a href="#desserts-maison" class="nav-link">Desserts Maison</a>
+            <a href="#glaces" class="nav-link">Glaces & Tartufo</a>
+            <a href="#boissons-chaudes" class="nav-link">Boissons Chaudes</a>
+            <a href="#boissons-froides" class="nav-link">Boissons Froides</a>
+            <a href="#ice-coffee" class="nav-link">Ice Coffee</a>
+            <a href="#milkshakes" class="nav-link">Milkshakes</a>
+            <a href="#mocktails" class="nav-link">Mocktails</a>
+        </div>
+    </nav>
+
+    <main>
+        <section id="petit-dejeuner" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-coffee"></i></span>
+                <h2>Petit Déjeuner</h2>
+                <div class="section-divider"></div>
+            </div>
+            <h4 class="subcategory-title" data-aos="fade-in"><i class="fas fa-star"></i> Nos Suggestions</h4>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up" data-description="La formule complète: 2 oeufs, fromage rouge, tapenade, huile d'olive, hasoua, jus, boisson chaude, verrine, eau.">
+                    <div class="card-badge">Populaire</div>
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    </video>
+                    <div class="card-content">
+                        <h3>Formule classique</h3>
+                        <p class="ingredients">Un petit déjeuner riche et varié.</p>
+                        <span class="price">38 Dh</span>
+                    </div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100" data-description="Un voyage au Maroc avec harcha, msemen, meloui, baghrir, amlou, jben, miel, olives noires et plus.">
+                    <div class="card-badge best">Best-seller</div>
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content">
+                        <h3>Formule saveur terroir</h3>
+                        <p class="ingredients">Le meilleur du petit-déjeuner marocain.</p>
+                        <span class="price">45 Dh</span>
+                    </div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200" data-description="Une touche d'élégance avec 2 oeufs, assortiment de charcuterie, tranches de fromage, jben, olives, hasoua et jus.">
+                    <div class="card-badge new">Nouveau</div>
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content">
+                        <h3>Formule nordique</h3>
+                        <p class="ingredients">Un assortiment frais et délicat.</p>
+                        <span class="price">50 Dh</span>
+                    </div>
+                </div>
+            </div>
+            <h4 class="subcategory-title" data-aos="fade-in"><i class="fas fa-utensils"></i> Toute la Carte</h4>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Formule express</h3><p>3 mini-viennoiseries, boisson chaude, jus d'orange ou de carotte, eau, hasoua</p><div class="price-line"><span class="price">35 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up" data-aos-delay="50"><h3>Formule mini kids</h3><p>Pancakes au chocolat, corn flakes, lait chaud, eau</p><div class="price-line"><span class="price">33 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Formule continentale</h3><p>Omelette au choix (champignons, charcuterie ou épinards), tapenade, huile d'olive, hasoua, jus, boisson chaude, verrine, eau</p><div class="price-line"><span class="price">42 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up" data-aos-delay="50"><h3>Formule Sabah Fès</h3><p>2 oeufs au khlii, tapenade, huile d'olive, hasoua, boisson chaude, jus, verrine, eau</p><div class="price-line"><span class="price">48 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Formule liège</h3><p>2 croissants farcis (cream cheese, laitue, jambon, fromage, oeuf), hasoua, jus, boisson chaude, verrine, eau</p><div class="price-line"><span class="price">55 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up" data-aos-delay="50"><h3>Formule Pays-Bas</h3><p>Croque-madame ou croque-monsieur, tapenade, huile d'olive, jus, boisson chaude, hasoua, verrine, eau</p><div class="price-line"><span class="price">48 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Formule chaoui</h3><p>Omelette berbère (tomate et poivron), tapenade, jben, jus, boisson chaude, hasoua, verrine, eau</p><div class="price-line"><span class="price">48 Dh</span></div></div>
+            </div>
+        </section>
+
+        <section id="brunch" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-egg"></i></span>
+                <h2>Brunch</h2>
+                <div class="section-divider"></div>
+            </div>
+            <h4 class="subcategory-title" data-aos="fade-in"><i class="fas fa-star"></i> Nos Suggestions</h4>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up" data-description="Pain bagel, fromage blanc, champignons, avocat, charcuterie, oeuf au plat, pommes de terre nouvelles, merguez, petite salade, verrine, croissant sucré, boisson chaude, eau.">
+                    <div class="card-badge best">Signature</div>
+                    <video class="lazy-video" poster="posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Brunch Le Manoir</h3><p class="ingredients">Le brunch ultime pour les gourmands.</p><span class="price">82 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100" data-description="2 tartines à la purée d'avocat et saumon fumé, 2 oeufs pochés, petite salade, boule de yaourt aux fruits frais et fruits secs, hasoua, boisson chaude, eau.">
+                    <div class="card-badge">Populaire</div>
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpG" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (4).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Brunch norvégien</h3><p class="ingredients">Frais, sain et délicieux.</p><span class="price">75 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200" data-description="2 oeufs brouillés, 3 saucisses, pommes de terre nouvelles, petite salade, 2 tranches de jambon, 2 pancakes au chocolat, hasoua, boisson chaude, eau.">
+                    <div class="card-badge new">Nouveau</div>
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Brunch English</h3><p class="ingredients">Un repas copieux pour les gourmands.</p><span class="price">70 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brunch espagnol</h3><p>Pain grillé, thon, tapenade d'olive, purée de tomate, tranche de fromage, mini quesadilla, 2 brochettes de fruits, verrine, hasoua, boisson chaude, eau</p><div class="price-line"><span class="price">68 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up" data-aos-delay="50"><h3>Brunch Oslo</h3><p>Tartine fromage blanc et avocat, tartine sucrée, oeufs brouillés, tranche d'Edam, tranche de jambon, poulet crispy, hasoua, boisson chaude, verrine sucrée</p><div class="price-line"><span class="price">73 Dh</span></div></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brunch Bénédicte</h3><p>2 toasts grillés, cream cheese, champignons, oeuf au plat, sauce fromagère, petite salade, pommes de terre nouvelles, pain brioché au chocolat</p><div class="price-line"><span class="price">73 Dh</span></div></div>
+            </div>
+        </section>
+
+        <section id="sandwichs" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-hamburger"></i></span>
+                <h2>Sandwichs & Accompagnements</h2>
+                <div class="section-divider"></div>
+            </div>
+            <h4 class="subcategory-title" data-aos="fade-in"><i class="fas fa-star"></i> Nos Suggestions</h4>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Le Boss</h3><p class="ingredients">Le sandwich des vrais patrons.</p><span class="price">55 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Le Monstre</h3><p class="ingredients">Pour les très grosses faims.</p><span class="price">60 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Mozzarella sticks</h3><p class="ingredients">L'accompagnement parfait.</p><span class="price">30 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Chicken Royal</h3><p>50 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Urbain Build</h3><p>55 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Onion rings</h3><p>25 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Nuggets</h3><p>28 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jalapenos</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Cheesy fries</h3><p>30 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Potatoes</h3><p>25 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Frites</h3><p>20 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="specialites" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-bread-slice"></i></span>
+                <h2>Spécialités & Pain Perdu</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Le Box Maison</h3><span class="price">85 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Mighty Crêpe</h3><span class="price">65 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Brioche perdue + caramel</h3><span class="price">48 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Mighty Oreo</h3><p>70 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Mighty Speculoos</h3><p>75 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brochette Pancakes</h3><p>65 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brioche salée</h3><p>53 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brioche fruits de mer</h3><p>55 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brioche perdue fruits</h3><p>53 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brioche perdue tiramisu</h3><p>50 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="crepes" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-cheese"></i></span>
+                <h2>Les Crêpes</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Kuna Crêpe</h3><span class="price">70 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Oreo Fettuccine</h3><span class="price">65 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Marisco</h3><span class="price">55 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Poulet & Champignons</h3><p>45 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jambon & Fromage</h3><p>45 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Quatre Fromages</h3><p>45 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Steak haché</h3><p>50 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Triple Chocolat</h3><p>48 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Lotus Fettuccine</h3><p>68 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Choco-Banane</h3><p>60 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pistachio</h3><p>65 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="desserts" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-ice-cream"></i></span>
+                <h2>Desserts: Choux, Gaufres & Pancakes</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Pistache & Kunafa</h3><span class="price">70 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Gaufre Pistacchio</h3><span class="price">70 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Pancake Amlou</h3><span class="price">63 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Choux Chocolat</h3><p>65 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Choux Speculoos</h3><p>68 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Gaufre Triple Chocolat</h3><p>55 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Gaufre Speculoos</h3><p>62 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Gaufre Oreo</h3><p>60 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pancakes Triple Choco</h3><p>50 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pancakes Fruits</h3><p>60 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pancakes Oreo</h3><p>55 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pancakes Lotus</h3><p>65 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Pancakes Pistache</h3><p>65 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="desserts-maison" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-birthday-cake"></i></span>
+                <h2>Desserts Maison</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>San Sebastián classique</h3><span class="price">40 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>San Sebastián pistache</h3><span class="price">55 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Assiette fruits italienne</h3><span class="price">200 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Crème brûlée</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brownie chocolat</h3><p>45 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Brownie pistache</h3><p>55 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Tiramisu</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Fruits (2 prs)</h3><p>80 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Les Tranches</h3><p>20 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Cake Américain</h3><p>25 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Trompe-l'œil</h3><p>32 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="glaces" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-ice-cream"></i></span>
+                <h2>Glaces & Tartufo</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Coupe Le Manoir</h3><span class="price">70 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Tartufo Pistacchio</h3><span class="price">70 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Tartufo Bianco</h3><span class="price">65 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>L'Italienne</h3><p>50 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Piccola</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>1 boule</h3><p>12 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>2 boules</h3><p>22 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>3 boules</h3><p>33 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Tartufo Nero</h3><p>58 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="boissons-chaudes" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-mug-hot"></i></span>
+                <h2>Boissons Chaudes</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Café Le Manoir</h3><span class="price">32 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Pistachio</h3><span class="price">28 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Le Manoir Chocolat</h3><span class="price">38 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Espresso</h3><p>16 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Double Espresso</h3><p>20 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Latte</h3><p>18 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Américain</h3><p>18 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Cappuccino</h3><p>24 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Matcha latte</h3><p>24 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Macchiato</h3><p>22 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Affogato</h3><p>22 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Thé</h3><p>16 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Chocolat Fondu</h3><p>25 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="boissons-froides" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-glass-water"></i></span>
+                <h2>Boissons Froides</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Avocat fruit sec</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Crunch Gold</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Green Détox</h3><span class="price">35 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jus Orange</h3><p>21 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jus Citron</h3><p>22 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jus Avocat</h3><p>26 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jus Fraise</h3><p>26 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Jus Mangue</h3><p>26 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Sahara</h3><p>36 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Crunch Rose</h3><p>38 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Soda</h3><p>16 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Red Bull</h3><p>28 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="ice-coffee" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-mug-saucer"></i></span>
+                <h2>Ice Coffee & Frappuccinos</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Frappuccino Le Manoir</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (3).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Ice Matcha</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Ice Spanish</h3><span class="price">26 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Ice Basic</h3><p>22 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Frappé</h3><p>24 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Ice Tea Citron</h3><p>18 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Ice Tea Pêche</h3><p>18 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Ice Tea Rouges</h3><p>22 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="milkshakes" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-blender"></i></span>
+                <h2>Milkshakes & Smoothies</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café - Copie (3).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Bounty Shake</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Lotus Shake</h3><span class="price">38 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Paradise Maracuja</h3><span class="price">36 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Milkshake Basic</h3><p>28 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Milkshake Mixte</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Smoothie Fresh Up</h3><p>36 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Smoothie Oasis</h3><p>36 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Smoothie Florida</h3><p>36 Dh</p></div>
+            </div>
+        </section>
+
+        <section id="mocktails" class="menu-section">
+            <div class="section-header" data-aos="fade-in">
+                <span class="section-icon"><i class="fas fa-cocktail"></i></span>
+                <h2>Mocktails & Mojitos</h2>
+                <div class="section-divider"></div>
+            </div>
+            <div class="popular-carousel">
+                <div class="popular-card" data-aos="fade-up">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Mocktail Le Manoir</h3><span class="price">40 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Mojito Energy</h3><span class="price">40 Dh</span></div>
+                </div>
+                <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
+                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
+                    </video>
+                    <div class="card-content"><h3>Pina Colada</h3><span class="price">35 Dh</span></div>
+                </div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item-card" data-aos="fade-up"><h3>Blue Hvar</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Grown Tropical</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Virgin Mojito</h3><p>30 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Red Mojito</h3><p>35 Dh</p></div>
+                <div class="menu-item-card" data-aos="fade-up"><h3>Passion Mojito</h3><p>35 Dh</p></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <h3 class="footer-logo">Le Manoir</h3>
+            <p class="footer-tagline">Une expérience culinaire unique</p>
+            <div class="footer-social">
+                <a href="https://www.instagram.com/cafelemanoir" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.facebook.com/CafeLeManoir" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            </div>
+            <div class="footer-info">
+                <p><i class="fas fa-phone"></i> +212 536505003</p>
+                <p><i class="fas fa-clock"></i> 7j/7 — 7h à 00h</p>
+            </div>
+            <p class="footer-copy">&copy; 2026 Le Manoir. Made by Mouad Diane.</p>
+        </div>
+    </footer>
+
+    <div id="item-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="Fermer">
+                <i class="fas fa-times"></i>
+            </button>
+            <video id="modal-video" controls playsinline></video>
+            <h3 id="modal-title"></h3>
+            <p id="modal-description"></p>
+        </div>
+    </div>
+
+    <button class="back-to-top" aria-label="Retour en haut">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const lazyVideos = document.querySelectorAll('video.lazy-video');
+
+            if ("IntersectionObserver" in window) {
+                const videoObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const video = entry.target;
+                            const source = video.querySelector('source');
+                            
+                            if (source && source.dataset.src) {
+                                source.src = source.dataset.src;
+                                video.load();
+                                video.classList.add('loaded');
+                                video.play().catch(e => console.log("Autoplay blocked"));
+                            }
+                            
+                            observer.unobserve(video);
+                        }
+                    });
+                }, {
+                    rootMargin: "0px 0px 300px 0px"
+                });
+
+                lazyVideos.forEach(v => videoObserver.observe(v));
+            } else {
+                lazyVideos.forEach(v => {
+                    const source = v.querySelector('source');
+                    if(source) source.src = source.dataset.src;
+                    v.load();
+                });
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
