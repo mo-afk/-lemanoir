@@ -54,6 +54,7 @@
             <button class="dark-mode-toggle" aria-label="Toggle dark mode">
                 <i class="fas fa-moon"></i>
             </button>
+            <a href="#roulette" class="nav-link nav-link--spin"><i class="fas fa-dharmachakra"></i> Roulette</a>
             <a href="#petit-dejeuner" class="nav-link active">Petit Déjeuner</a>
             <a href="#brunch" class="nav-link">Brunch</a>
             <a href="#sandwichs" class="nav-link">Sandwichs</a>
@@ -71,6 +72,92 @@
     </nav>
 
     <main>
+        <section id="roulette" class="menu-section roulette-section">
+            <div class="section-header roulette-header">
+                <span class="section-icon"><i class="fas fa-dharmachakra"></i></span>
+                <h2>La Roulette Le Manoir</h2>
+                <div class="section-divider"></div>
+                <p class="roulette-tagline">Indécis&nbsp;? Choisissez votre service, lancez la roue et laissez le hasard vous régaler.</p>
+            </div>
+
+            <div class="roulette-layout">
+                <div class="roulette-controls">
+                    <div class="roulette-periods" id="roulette-periods" role="group" aria-label="Choisir le service">
+                        <button type="button" class="period-chip" data-period="breakfast">
+                            <i class="fas fa-mug-hot"></i>
+                            <span class="period-name">Petit Déj</span>
+                            <span class="period-time">07h — 11h</span>
+                        </button>
+                        <button type="button" class="period-chip" data-period="lunch">
+                            <i class="fas fa-utensils"></i>
+                            <span class="period-name">Déjeuner</span>
+                            <span class="period-time">12h — 16h</span>
+                        </button>
+                        <button type="button" class="period-chip" data-period="dinner">
+                            <i class="fas fa-moon"></i>
+                            <span class="period-name">Dîner</span>
+                            <span class="period-time">19h — 00h</span>
+                        </button>
+                    </div>
+
+                    <div class="wheel-shell">
+                        <div class="wheel-pointer" aria-hidden="true"></div>
+                        <div class="wheel-frame">
+                            <canvas id="wheel-canvas" aria-hidden="true"></canvas>
+                            <button type="button" class="wheel-hub" id="wheel-hub" aria-label="Lancer la roulette">
+                                <span class="wheel-hub-label">SPIN</span>
+                                <span class="wheel-hub-sub">Tourner</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="spin-row">
+                        <button type="button" class="spin-btn" id="spin-btn">
+                            <i class="fas fa-arrows-rotate"></i>
+                            <span>Lancer la roulette</span>
+                        </button>
+                    </div>
+                    <p class="roulette-hint" id="roulette-hint"></p>
+                </div>
+
+                <div class="roulette-result" id="roulette-result" aria-live="polite">
+                    <div class="result-reel" id="result-reel">
+                        <i class="fas fa-dharmachakra" aria-hidden="true"></i>
+                        <p id="result-reel-text">Prêt à tourner la roue</p>
+                        <p class="result-reel-hint">Le gagnant s'affichera ici, avec sa vidéo.</p>
+                    </div>
+
+                    <article class="result-card" id="result-card">
+                        <div class="result-media" id="result-media">
+                            <video id="result-video" muted loop playsinline preload="none"></video>
+                            <div class="result-media-fallback">
+                                <i class="fas fa-utensils" aria-hidden="true"></i>
+                                <span id="result-media-label"></span>
+                            </div>
+                        </div>
+                        <div class="result-body">
+                            <p class="result-kicker" id="result-kicker">Le hasard a choisi</p>
+                            <h3 class="result-title" id="result-title"></h3>
+                            <div class="result-meta">
+                                <span class="result-price" id="result-price"></span>
+                                <span class="result-origin" id="result-origin"></span>
+                            </div>
+                            <p class="result-desc" id="result-desc"></p>
+                            <p class="result-pairing" id="result-pairing"></p>
+                            <div class="result-actions">
+                                <button type="button" class="result-btn ghost" id="result-locate">
+                                    <i class="fas fa-location-arrow"></i> Voir dans le menu
+                                </button>
+                                <button type="button" class="result-btn" id="result-respin">
+                                    <i class="fas fa-arrows-rotate"></i> Relancer
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
         <section id="petit-dejeuner" class="menu-section">
             <div class="section-header" data-aos="fade-in">
                 <span class="section-icon"><i class="fas fa-coffee"></i></span>
