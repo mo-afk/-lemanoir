@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
     <style>
         video {
             object-fit: cover;
@@ -582,6 +582,8 @@
             <div class="footer-social">
                 <a href="https://www.instagram.com/cafelemanoir" target="_blank"><i class="fab fa-instagram"></i></a>
                 <a href="https://www.facebook.com/CafeLeManoir" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.tiktok.com/@cafelemanoir" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Cafe+Le+Manoir" target="_blank" rel="noopener" aria-label="Localisation"><i class="fas fa-location-dot"></i></a>
             </div>
             <div class="footer-info">
                 <p><i class="fas fa-phone"></i> +212 536505003</p>
@@ -605,6 +607,89 @@
     <button class="back-to-top" aria-label="Retour en haut">
         <i class="fas fa-arrow-up"></i>
     </button>
+    <button class="roulette-fab" id="roulette-fab" aria-label="Ouvrir le générateur de combo idéal" aria-haspopup="dialog">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span class="fab-label">Combo Idéal</span>
+    </button>
+
+    <div id="roulette-modal" class="roulette-modal" role="dialog" aria-modal="true" aria-label="Générateur de Combo Idéal">
+        <div class="rm-panel">
+            <button class="rm-close" id="rm-close" aria-label="Fermer">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <header class="rm-header">
+                <span class="section-icon"><i class="fas fa-wand-magic-sparkles"></i></span>
+                <h2>Combo Idéal</h2>
+                <div class="section-divider"></div>
+                <p class="rm-tagline">Un plat + une boisson qui va avec, choisis pour toi.</p>
+            </header>
+
+            <div class="rm-body">
+                <div class="roulette-periods" role="group" aria-label="Choisir le service">
+                    <button type="button" class="period-chip" data-period="breakfast">
+                        <i class="fas fa-mug-hot"></i><span class="period-name">Petit Déj</span><span class="period-time">07h — 11h</span>
+                    </button>
+                    <button type="button" class="period-chip" data-period="lunch">
+                        <i class="fas fa-utensils"></i><span class="period-name">Déjeuner</span><span class="period-time">12h — 16h</span>
+                    </button>
+                    <button type="button" class="period-chip" data-period="dinner">
+                        <i class="fas fa-moon"></i><span class="period-name">Dîner</span><span class="period-time">19h — 00h</span>
+                    </button>
+                </div>
+
+                <div class="wheel-shell show" id="wheel-shell">
+                    <div class="wheel-pointer" aria-hidden="true"></div>
+                    <div class="wheel-frame">
+                        <canvas id="wheel-canvas" aria-hidden="true"></canvas>
+                        <button type="button" class="wheel-hub" id="wheel-hub" aria-label="Proposer un combo">
+                            <span class="wheel-hub-label">SPIN</span>
+                            <span class="wheel-hub-sub">Combo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="rm-actions">
+                    <button type="button" class="spin-btn" id="spin-btn"><i class="fas fa-arrows-rotate"></i><span>Spin / Proposer</span></button>
+                </div>
+                <p class="roulette-hint" id="roulette-hint"></p>
+
+                <div class="rm-result" aria-live="polite">
+                    <div class="result-reel" id="result-reel">
+                        <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                        <p id="result-reel-text">Choisis ton service puis lance la roue</p>
+                    </div>
+
+                    <article class="combo-card" id="combo-card">
+                        <div class="combo-media" id="combo-media">
+                            <video id="combo-video" muted loop playsinline preload="none"></video>
+                            <div class="combo-media-fallback">
+                                <i class="fas fa-utensils" aria-hidden="true"></i>
+                                <span id="combo-media-label"></span>
+                            </div>
+                        </div>
+                        <div class="combo-body">
+                            <p class="combo-kicker" id="combo-kicker">Ton combo idéal</p>
+                            <div class="combo-line">
+                                <span class="combo-name" id="combo-dish"></span>
+                                <span class="combo-price" id="combo-dish-price"></span>
+                            </div>
+                            <div class="combo-plus" aria-hidden="true">+</div>
+                            <div class="combo-line drink">
+                                <span class="combo-name" id="combo-drink"></span>
+                                <span class="combo-price" id="combo-drink-price"></span>
+                            </div>
+                            <div class="combo-total"><span>Total</span><strong id="combo-total"></strong></div>
+                            <div class="combo-actions">
+                                <button type="button" class="result-btn ghost" id="act-respin"><i class="fas fa-arrows-rotate"></i> Re-spin</button>
+                                <button type="button" class="result-btn" id="act-locate"><i class="fas fa-location-arrow"></i> Voir dans le menu</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
@@ -644,6 +729,6 @@
             }
         });
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
