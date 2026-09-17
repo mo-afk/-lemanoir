@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <style>
         video {
             object-fit: cover;
@@ -605,150 +605,86 @@
     <button class="back-to-top" aria-label="Retour en haut">
         <i class="fas fa-arrow-up"></i>
     </button>
-    <button class="roulette-fab" id="roulette-fab" aria-label="Ouvrir la roulette Le Manoir" aria-haspopup="dialog">
-        <i class="fas fa-dharmachakra"></i>
-        <span class="fab-label">Spin &amp; Win</span>
+    <button class="roulette-fab" id="roulette-fab" aria-label="Ouvrir le générateur de combo idéal" aria-haspopup="dialog">
+        <i class="fas fa-wand-magic-sparkles"></i>
+        <span class="fab-label">Combo Idéal</span>
     </button>
 
-    <div id="roulette-modal" class="roulette-modal" role="dialog" aria-modal="true" aria-label="La Roulette Le Manoir">
+    <div id="roulette-modal" class="roulette-modal" role="dialog" aria-modal="true" aria-label="Générateur de Combo Idéal">
         <div class="rm-panel">
             <button class="rm-close" id="rm-close" aria-label="Fermer">
                 <i class="fas fa-times"></i>
             </button>
 
             <header class="rm-header">
-                <span class="section-icon"><i class="fas fa-dharmachakra"></i></span>
-                <h2>La Roulette Le Manoir</h2>
+                <span class="section-icon"><i class="fas fa-wand-magic-sparkles"></i></span>
+                <h2>Combo Idéal</h2>
                 <div class="section-divider"></div>
+                <p class="rm-tagline">Un plat + une boisson qui va avec, choisis pour toi.</p>
             </header>
 
             <div class="rm-body">
-                <div class="wheel-shell" id="wheel-shell">
+                <div class="roulette-periods" role="group" aria-label="Choisir le service">
+                    <button type="button" class="period-chip" data-period="breakfast">
+                        <i class="fas fa-mug-hot"></i><span class="period-name">Petit Déj</span><span class="period-time">07h — 11h</span>
+                    </button>
+                    <button type="button" class="period-chip" data-period="lunch">
+                        <i class="fas fa-utensils"></i><span class="period-name">Déjeuner</span><span class="period-time">12h — 16h</span>
+                    </button>
+                    <button type="button" class="period-chip" data-period="dinner">
+                        <i class="fas fa-moon"></i><span class="period-name">Dîner</span><span class="period-time">19h — 00h</span>
+                    </button>
+                </div>
+
+                <div class="wheel-shell show" id="wheel-shell">
                     <div class="wheel-pointer" aria-hidden="true"></div>
                     <div class="wheel-frame">
                         <canvas id="wheel-canvas" aria-hidden="true"></canvas>
-                        <button type="button" class="wheel-hub" id="wheel-hub" aria-label="Lancer la roulette">
+                        <button type="button" class="wheel-hub" id="wheel-hub" aria-label="Proposer un combo">
                             <span class="wheel-hub-label">SPIN</span>
-                            <span class="wheel-hub-sub">Tourner</span>
+                            <span class="wheel-hub-sub">Combo</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- ÉCRAN : choix du mode -->
-                <section class="rm-screen is-active" data-screen="mode">
-                    <p class="rm-question">Comment veux-tu jouer&nbsp;?</p>
-                    <div class="rm-mode-row">
-                        <button type="button" class="mode-btn" data-mode="solo">
-                            <i class="fas fa-user"></i><span>Solo</span>
-                        </button>
-                        <button type="button" class="mode-btn" data-mode="group">
-                            <i class="fas fa-users"></i><span>Mode Groupe</span>
-                        </button>
-                    </div>
-                    <p class="rm-field-label">Ton service</p>
-                    <div class="roulette-periods" role="group" aria-label="Choisir le service">
-                        <button type="button" class="period-chip" data-period="breakfast">
-                            <i class="fas fa-mug-hot"></i><span class="period-name">Petit Déj</span><span class="period-time">07h — 11h</span>
-                        </button>
-                        <button type="button" class="period-chip" data-period="lunch">
-                            <i class="fas fa-utensils"></i><span class="period-name">Déjeuner</span><span class="period-time">12h — 16h</span>
-                        </button>
-                        <button type="button" class="period-chip" data-period="dinner">
-                            <i class="fas fa-moon"></i><span class="period-name">Dîner</span><span class="period-time">19h — 00h</span>
-                        </button>
-                    </div>
-                </section>
+                <div class="rm-actions">
+                    <button type="button" class="spin-btn" id="spin-btn"><i class="fas fa-arrows-rotate"></i><span>Spin / Proposer</span></button>
+                </div>
+                <p class="roulette-hint" id="roulette-hint"></p>
 
-                <!-- ÉCRAN : taille du groupe -->
-                <section class="rm-screen" data-screen="groupsize">
-                    <p class="rm-question">Combien de joueurs à la table&nbsp;?</p>
-                    <div class="rm-stepper">
-                        <button type="button" id="gs-minus" aria-label="Moins">−</button>
-                        <span id="gs-value">2</span>
-                        <button type="button" id="gs-plus" aria-label="Plus">+</button>
-                    </div>
-                    <p class="rm-field-label">Ton service</p>
-                    <div class="roulette-periods" role="group" aria-label="Choisir le service">
-                        <button type="button" class="period-chip" data-period="breakfast">
-                            <i class="fas fa-mug-hot"></i><span class="period-name">Petit Déj</span><span class="period-time">07h — 11h</span>
-                        </button>
-                        <button type="button" class="period-chip" data-period="lunch">
-                            <i class="fas fa-utensils"></i><span class="period-name">Déjeuner</span><span class="period-time">12h — 16h</span>
-                        </button>
-                        <button type="button" class="period-chip" data-period="dinner">
-                            <i class="fas fa-moon"></i><span class="period-name">Dîner</span><span class="period-time">19h — 00h</span>
-                        </button>
-                    </div>
-                    <div class="rm-actions">
-                        <button type="button" class="spin-btn" id="gs-start"><i class="fas fa-play"></i><span>Commencer</span></button>
-                    </div>
-                </section>
-
-                <!-- ÉCRAN : jeu (solo ou tour par tour) -->
-                <section class="rm-screen" data-screen="play">
-                    <div class="rm-turn-info" id="rm-turn-info"></div>
-                    <p class="roulette-hint" id="roulette-hint"></p>
-                    <div class="rm-actions">
-                        <button type="button" class="spin-btn" id="spin-btn"><i class="fas fa-arrows-rotate"></i><span>Lancer la roulette</span></button>
+                <div class="rm-result" aria-live="polite">
+                    <div class="result-reel" id="result-reel">
+                        <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+                        <p id="result-reel-text">Choisis ton service puis lance la roue</p>
                     </div>
 
-                    <div class="rm-result" aria-live="polite">
-                        <div class="result-reel" id="result-reel">
-                            <i class="fas fa-dharmachakra" aria-hidden="true"></i>
-                            <p id="result-reel-text">Prêt à tourner la roue</p>
+                    <article class="combo-card" id="combo-card">
+                        <div class="combo-media" id="combo-media">
+                            <video id="combo-video" muted loop playsinline preload="none"></video>
+                            <div class="combo-media-fallback">
+                                <i class="fas fa-utensils" aria-hidden="true"></i>
+                                <span id="combo-media-label"></span>
+                            </div>
                         </div>
-
-                        <article class="result-card" id="result-card">
-                            <div class="result-media" id="result-media">
-                                <video id="result-video" muted loop playsinline preload="none"></video>
-                                <div class="result-media-fallback">
-                                    <i class="fas fa-utensils" aria-hidden="true"></i>
-                                    <span id="result-media-label"></span>
-                                </div>
+                        <div class="combo-body">
+                            <p class="combo-kicker" id="combo-kicker">Ton combo idéal</p>
+                            <div class="combo-line">
+                                <span class="combo-name" id="combo-dish"></span>
+                                <span class="combo-price" id="combo-dish-price"></span>
                             </div>
-                            <div class="result-body">
-                                <p class="result-kicker" id="result-kicker">Le hasard a choisi</p>
-                                <h3 class="result-title" id="result-title"></h3>
-                                <div class="result-meta">
-                                    <span class="result-price" id="result-price"></span>
-                                    <span class="result-origin" id="result-origin"></span>
-                                </div>
-                                <p class="result-desc" id="result-desc"></p>
-                                <div class="result-actions">
-                                    <button type="button" class="result-btn ghost" id="act-respin"><i class="fas fa-arrows-rotate"></i> Re-spin</button>
-                                    <button type="button" class="result-btn" id="act-validate"><i class="fas fa-check"></i> Valider &amp; Suivant</button>
-                                </div>
+                            <div class="combo-plus" aria-hidden="true">+</div>
+                            <div class="combo-line drink">
+                                <span class="combo-name" id="combo-drink"></span>
+                                <span class="combo-price" id="combo-drink-price"></span>
                             </div>
-                        </article>
-                    </div>
-                </section>
-
-                <!-- ÉCRAN : résumé de la table -->
-                <section class="rm-screen" data-screen="summary">
-                    <p class="rm-question">Votre table est prête&nbsp;!</p>
-                    <ul class="sum-list" id="sum-list"></ul>
-                    <div class="sum-total"><span>Addition</span><strong id="sum-total">0 Dh</strong></div>
-                    <div class="rm-actions col">
-                        <button type="button" class="spin-btn" id="sum-pay"><i class="fas fa-hand-holding-dollar"></i><span>Qui paye l'addition&nbsp;?</span></button>
-                        <button type="button" class="result-btn ghost" id="sum-restart"><i class="fas fa-rotate-left"></i> Recommencer</button>
-                    </div>
-                </section>
-
-                <!-- ÉCRAN : qui paye -->
-                <section class="rm-screen" data-screen="pay">
-                    <p class="rm-question">Qui paye l'addition&nbsp;?</p>
-                    <p class="rm-field-label">Les participants</p>
-                    <div class="pay-names" id="pay-names"></div>
-                    <p class="rm-field-label">Combien de personnes payent&nbsp;?</p>
-                    <div class="pay-count" id="pay-count">
-                        <button type="button" class="paycount-btn is-active" data-count="1">1</button>
-                        <button type="button" class="paycount-btn" data-count="2">2</button>
-                    </div>
-                    <div class="rm-actions">
-                        <button type="button" class="spin-btn" id="pay-spin"><i class="fas fa-arrows-rotate"></i><span>Tourner la roue des noms</span></button>
-                    </div>
-                    <div class="pay-result" id="pay-result" aria-live="polite"></div>
-                </section>
+                            <div class="combo-total"><span>Total</span><strong id="combo-total"></strong></div>
+                            <div class="combo-actions">
+                                <button type="button" class="result-btn ghost" id="act-respin"><i class="fas fa-arrows-rotate"></i> Re-spin</button>
+                                <button type="button" class="result-btn" id="act-locate"><i class="fas fa-location-arrow"></i> Voir dans le menu</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
             </div>
         </div>
     </div>
@@ -791,6 +727,6 @@
             }
         });
     </script>
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>

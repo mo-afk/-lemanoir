@@ -211,29 +211,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /* ==========================================================================
-   LA ROULETTE LE MANOIR  —  Floating Widget (FAB + Modal)
+   LA ROULETTE LE MANOIR  —  Générateur de Combo Idéal  [v3 simplifié]
    ==========================================================================
-   • Lit la carte depuis le DOM déjà présent dans index.html (rien n'est dupliqué).
-   • Modes Solo / Groupe, tirage tour par tour, pas de doublon à la même table.
-   • Résumé de la table (addition) + mini-jeu "Qui paye l'addition ?".
+   • Une seule personne : la roue choisit un plat principal adapté au service,
+     puis un code d'accord suggère une boisson qui va avec (atay / café / jus…).
+   • Affiche le combo (plat + boisson + total en Dh), Re-spin et
+     « Voir dans le menu ».
+   • Lit la carte depuis le DOM (rien n'est dupliqué).
    ========================================================================== */
 (function () {
     'use strict';
-
-    /* ---------------------------------------------------- Configuration --- */
 
     var SLICE_COUNT     = 8;
     var MIN_MAIN_PRICE  = 30;
     var SPIN_MS         = 3600;
     var SPIN_MS_REDUCED = 1100;
     var FULL_TURNS      = 5;
-    var MIN_GROUP       = 2;
-    var MAX_GROUP       = 8;
 
     var PERIODS = {
-        breakfast: { label: 'Petit-déjeuner', short: 'petit-déjeuner' },
-        lunch:     { label: 'Déjeuner',       short: 'déjeuner' },
-        dinner:    { label: 'Dîner',          short: 'dîner' }
+        breakfast: { label: 'Petit-déjeuner' },
+        lunch:     { label: 'Déjeuner' },
+        dinner:    { label: 'Dîner' }
     };
 
     var SECTION_META = {
@@ -258,730 +256,374 @@ document.addEventListener('DOMContentLoaded', () => {
     var SIDE_WORDS = ['frites', 'fry', 'fries', 'onion rings', 'nuggets', 'mozzarella sticks',
                       'jalapeno', 'cheesy', 'potatoes', 'supplement', 'boule', 'tranche',
                       'topping', 'crouton'];
-
     var SAVORY_WORDS = ['poulet', 'jambon', 'fromage', 'steak', 'marisco', 'de mer', 'salee',
                         'champignon', 'oeuf', 'khlii', 'omelette', 'saumon', 'thon', 'croque',
                         'merguez', 'crispy', 'bagel'];
-
     var SWEET_WORDS = ['chocolat', 'choco', 'oreo', 'speculoos', 'lotus', 'pistache', 'pistachio',
                        'pistacchio', 'banane', 'caramel', 'fruits', 'tiramisu', 'nutella', 'amlou',
                        'kuna', 'kunafa', 'pancake', 'gaufre', 'choux', 'maracuja', 'sucree'];
+    /* Plats marocains -> atay / thé à la menthe */
+    var MOROCCAN_WORDS = ['terroir', 'sabah', 'chaoui', 'fes', 'maroc', 'khlii', 'amlou', 'harcha', 'msemen', 'nordique'];
 
     /* ------------------------------------------------------------- Utils --- */
-
-    function normalize(str) {
-        return String(str || '').toLowerCase().normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ')
-            .replace(/\s+/g, ' ').trim();
-    }
-    function hasAny(h, words) { for (var i = 0; i < words.length; i++) if (h.indexOf(words[i]) !== -1) return true; return false; }
-    function parsePrice(t) { var m = String(t || '').match(/(\d+(?:[.,]\d+)?)\s*(?:dh|mad|dhs)/i); return m ? parseFloat(m[1].replace(',', '.')) : null; }
-    function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-    function weightOf(it) { return it.video ? 2 : 1; }
-    function pickWeighted(list) {
-        var total = 0, i;
-        for (i = 0; i < list.length; i++) total += weightOf(list[i]);
-        var r = Math.random() * total;
-        for (i = 0; i < list.length; i++) { r -= weightOf(list[i]); if (r <= 0) return list[i]; }
-        return list[list.length - 1];
-    }
+    function normalize(s) { return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+    function hasAny(h, w) { for (var i=0;i<w.length;i++) if (h.indexOf(w[i])!==-1) return true; return false; }
+    function parsePrice(t) { var m=String(t||'').match(/(\d+(?:[.,]\d+)?)\s*(?:dh|mad|dhs)/i); return m?parseFloat(m[1].replace(',','.')):null; }
+    function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+    function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+    function weightOf(it){ return it.video?2:1; }
+    function pickWeighted(list){ var t=0,i; for(i=0;i<list.length;i++)t+=weightOf(list[i]); var r=Math.random()*t; for(i=0;i<list.length;i++){r-=weightOf(list[i]); if(r<=0)return list[i];} return list[list.length-1]; }
 
     /* --------------------------------------------------- Lecture du DOM --- */
-
-    function sectionMeta(section) {
-        var id = section.id || '';
+    function sectionMeta(section){
+        var id=section.id||'';
         if (SECTION_META[id]) return SECTION_META[id];
-        var title = normalize((section.querySelector('.section-header h2') || {}).textContent);
-        var kind = hasAny(title, DRINK_HINTS) ? 'drink' : hasAny(title, DESSERT_HINTS) ? 'dessert' : null;
-        return { label: (section.querySelector('.section-header h2') || {}).textContent || 'La carte', kind: kind, meals: kind ? [] : ['breakfast', 'lunch', 'dinner'] };
+        var title=normalize((section.querySelector('.section-header h2')||{}).textContent);
+        var kind=hasAny(title,DRINK_HINTS)?'drink':hasAny(title,DESSERT_HINTS)?'dessert':null;
+        return { label:(section.querySelector('.section-header h2')||{}).textContent||'La carte', kind:kind, meals:kind?[]:['breakfast','lunch','dinner'] };
     }
-
-    function readMedia(card) {
-        var video = card.querySelector('video');
-        var source = card.querySelector('source');
-        var src = (source && (source.getAttribute('data-src') || source.getAttribute('src'))) || (video && video.getAttribute('src')) || '';
-        return { video: src || null, poster: (video && video.getAttribute('poster')) || null };
+    function readMedia(card){
+        var video=card.querySelector('video'), source=card.querySelector('source');
+        var src=(source&&(source.getAttribute('data-src')||source.getAttribute('src')))||(video&&video.getAttribute('src'))||'';
+        return { video:src||null, poster:(video&&video.getAttribute('poster'))||null };
     }
-
-    function buildMenuItem(card, section) {
-        var h3 = card.querySelector('h3');
-        if (!h3) return null;
-        var name = h3.textContent.trim();
-        var pEl = card.querySelector('p');
-        var pText = pEl ? pEl.textContent.trim() : '';
-        var priceOnly = /^\s*\d+(?:[.,]\d+)?\s*dh\s*$/i.test(pText);
-        var price = parsePrice((card.querySelector('.price') || {}).textContent) || (priceOnly ? parsePrice(pText) : null);
-        var media = readMedia(card);
-        return { id: name + '|' + section.id, name: name, price: price, description: priceOnly ? '' : pText,
-                 badge: (card.querySelector('.card-badge') || {}).textContent || '', sectionId: section.id,
-                 el: card, video: media.video, poster: media.poster };
+    function buildMenuItem(card, section){
+        var h3=card.querySelector('h3'); if(!h3) return null;
+        var name=h3.textContent.trim();
+        var pEl=card.querySelector('p'); var pText=pEl?pEl.textContent.trim():'';
+        var priceOnly=/^\s*\d+(?:[.,]\d+)?\s*dh\s*$/i.test(pText);
+        var price=parsePrice((card.querySelector('.price')||{}).textContent)||(priceOnly?parsePrice(pText):null);
+        var media=readMedia(card);
+        return { id:name+'|'+section.id, name:name, price:price, description:priceOnly?'':pText,
+                 badge:(card.querySelector('.card-badge')||{}).textContent||'', sectionId:section.id,
+                 el:card, video:media.video, poster:media.poster };
     }
-
-    function classify(item, meta) {
-        var n = normalize(item.name);
-        if (meta.kind === 'drink') return 'drink';
-        if (meta.kind === 'dessert') return 'dessert';
-        if (hasAny(n, SIDE_WORDS)) return 'side';
-        if (item.price !== null && item.price < MIN_MAIN_PRICE) return 'side';
+    function classify(item, meta){
+        var n=normalize(item.name);
+        if (meta.kind==='drink') return 'drink';
+        if (meta.kind==='dessert') return 'dessert';
+        if (hasAny(n,SIDE_WORDS)) return 'side';
+        if (item.price!==null && item.price<MIN_MAIN_PRICE) return 'side';
         return 'main';
     }
-    function flavor(item) {
-        var n = normalize(item.name);
-        if (hasAny(n, SAVORY_WORDS)) return 'savory';
-        if (hasAny(n, SWEET_WORDS)) return 'sweet';
+    function flavor(item){
+        var n=normalize(item.name);
+        if (hasAny(n,SAVORY_WORDS)) return 'savory';
+        if (hasAny(n,SWEET_WORDS)) return 'sweet';
         return 'neutral';
     }
-    function finishItem(item, meta, meals) {
-        item.kind = classify(item, meta);
-        item.flavor = flavor(item);
-        item.sectionName = meta.label;
-        item.meals = item.kind === 'main' ? meals : (meta.meals || []);
-    }
-    function collectMenu() {
-        var items = [];
-        Array.prototype.forEach.call(document.querySelectorAll('main .menu-section'), function (section) {
-            var meta = sectionMeta(section);
-            var meals = meta.meals || [];
-            Array.prototype.forEach.call(section.querySelectorAll('.popular-card'), function (card) {
-                var item = buildMenuItem(card, section);
-                if (!item) return;
-                var desc = card.getAttribute('data-description'); if (desc) item.description = desc.trim();
-                var badge = card.querySelector('.card-badge'); item.badge = badge ? badge.textContent.trim() : '';
-                finishItem(item, meta, meals); items.push(item);
+    function isMoroccan(item){ return hasAny(normalize(item.name), MOROCCAN_WORDS); }
+    function collectMenu(){
+        var items=[];
+        Array.prototype.forEach.call(document.querySelectorAll('main .menu-section'), function(section){
+            var meta=sectionMeta(section), meals=meta.meals||[];
+            Array.prototype.forEach.call(section.querySelectorAll('.popular-card'), function(card){
+                var item=buildMenuItem(card, section); if(!item) return;
+                var d=card.getAttribute('data-description'); if(d) item.description=d.trim();
+                var b=card.querySelector('.card-badge'); item.badge=b?b.textContent.trim():'';
+                item.kind=classify(item,meta); item.flavor=flavor(item); item.sectionName=meta.label;
+                item.meals=item.kind==='main'?meals:(meta.meals||[]);
+                items.push(item);
             });
-            Array.prototype.forEach.call(section.querySelectorAll('.menu-item-card'), function (card) {
-                var item = buildMenuItem(card, section);
-                if (!item) return;
-                finishItem(item, meta, meals); items.push(item);
+            Array.prototype.forEach.call(section.querySelectorAll('.menu-item-card'), function(card){
+                var item=buildMenuItem(card, section); if(!item) return;
+                item.kind=classify(item,meta); item.flavor=flavor(item); item.sectionName=meta.label;
+                item.meals=item.kind==='main'?meals:(meta.meals||[]);
+                items.push(item);
             });
         });
         return items;
     }
-    function candidatesFor(period) {
-        return MENU.filter(function (it) {
-            if (it.kind !== 'main') return false;
-            if (it.meals.indexOf(period) === -1) return false;
-            if (period === 'lunch' && it.flavor === 'sweet') return false;
+    function candidatesFor(period){
+        return MENU.filter(function(it){
+            if (it.kind!=='main') return false;
+            if (it.meals.indexOf(period)===-1) return false;
+            if (period==='lunch' && it.flavor==='sweet') return false;
             return true;
         });
     }
 
+    /* --------------------------------------------- Accord plat / boisson --- */
+    function drinksOf(sections){ return MENU.filter(function(i){ return i.kind==='drink' && sections.indexOf(i.sectionId)!==-1; }); }
+    function prefer(pool, words){
+        var m=pool.filter(function(i){ return hasAny(normalize(i.name), words); });
+        return m.length ? pick(m) : null;
+    }
+
+    function suggestDrink(dish, period){
+        var hot  = drinksOf(['boissons-chaudes']);
+        var cold = drinksOf(['boissons-froides','ice-coffee','milkshakes']);
+        var mock = drinksOf(['mocktails']);
+        var sweet = dish.flavor==='sweet';
+        var moroccan = isMoroccan(dish);
+
+        if (period==='breakfast') {
+            if (moroccan) return prefer(hot,['the','menthe']) || pick(hot);
+            if (sweet)    return prefer(hot,['cafe','espresso','cappuccino','latte','chocolat']) || pick(hot);
+            return pick(hot.concat(cold));
+        }
+        /* déjeuner / dîner */
+        if (sweet) return prefer(hot,['cafe','espresso','cappuccino','latte']) || pick(hot);
+        if (period==='dinner' && mock.length && Math.random()<0.35) return pick(mock);
+        return prefer(cold,['jus orange','orange','soda']) || pick(cold) || pick(mock);
+    }
+
     /* ---------------------------------------------------------------- DOM --- */
+    var MENU=[];
+    var period='lunch';
+    var canvas, ctx, frame, hub, wheelShell, modal, fab, closeBtn;
+    var spinBtn, hintEl, reel, reelText;
+    var comboCard, comboVideo, comboMedia, comboMediaLabel;
+    var comboDish, comboDishPrice, comboDrink, comboDrinkPrice, comboTotal, comboKicker;
+    var actRespin, actLocate;
 
-    var MENU = [];
-    var state = {
-        mode: null,               // 'solo' | 'group'
-        period: 'lunch',
-        groupSize: 2,
-        players: [],              // [{name, dish, confirmed}]
-        current: 0,
-        takenIds: [],             // plats déjà validés à la table
-        payersNeeded: 1,
-        payers: [],
-        screen: 'mode'
-    };
+    var pool=[], slices=[], winner=null, lastDish=null, lastDrink=null;
+    var rotation=0, spinning=false, radius=0, reelTimer=null;
+    var reduced=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    var canvas, ctx, frame, hub, wheelShell;
-    var modal, fab, closeBtn;
-    var spinBtn, paySpinBtn, hintEl, turnInfo;
-    var reel, reelText, resultCard;
-    var resultTitle, resultPrice, resultOrigin, resultDesc, resultKicker;
-    var resultMedia, resultVideo, resultMediaLabel;
-    var actRespin, actValidate;
-    var gsMinus, gsPlus, gsValue, gsStart;
-    var sumList, sumTotal, sumPay, sumRestart;
-    var payNames, payCount, payResult;
+    function $(id){ return document.getElementById(id); }
 
-    var pool = [];
-    var slices = [];
-    var winner = null;
-    var rotation = 0;
-    var spinning = false;
-    var radius = 0;
-    var reelTimer = null;
-    var onEnd = null;
-    var wheelKind = 'dish';
-    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function init(){
+        canvas=$('wheel-canvas'); frame=document.querySelector('.wheel-frame'); hub=$('wheel-hub');
+        wheelShell=$('wheel-shell'); modal=$('roulette-modal'); fab=$('roulette-fab'); closeBtn=$('rm-close');
+        spinBtn=$('spin-btn'); hintEl=$('roulette-hint'); reel=$('result-reel'); reelText=$('result-reel-text');
+        comboCard=$('combo-card'); comboVideo=$('combo-video'); comboMedia=$('combo-media'); comboMediaLabel=$('combo-media-label');
+        comboDish=$('combo-dish'); comboDishPrice=$('combo-dish-price'); comboDrink=$('combo-drink');
+        comboDrinkPrice=$('combo-drink-price'); comboTotal=$('combo-total'); comboKicker=$('combo-kicker');
+        actRespin=$('act-respin'); actLocate=$('act-locate');
 
-    function $(id) { return document.getElementById(id); }
+        if(!canvas||!modal||!fab) return;
+        ctx=canvas.getContext('2d');
+        MENU=collectMenu();
 
-    function init() {
-        canvas = $('wheel-canvas');
-        frame = document.querySelector('.wheel-frame');
-        hub = $('wheel-hub');
-        wheelShell = $('wheel-shell');
-        modal = $('roulette-modal');
-        fab = $('roulette-fab');
-        closeBtn = $('rm-close');
-        spinBtn = $('spin-btn');
-        paySpinBtn = $('pay-spin');
-        hintEl = $('roulette-hint');
-        turnInfo = $('rm-turn-info');
-        reel = $('result-reel');
-        reelText = $('result-reel-text');
-        resultCard = $('result-card');
-        resultTitle = $('result-title');
-        resultPrice = $('result-price');
-        resultOrigin = $('result-origin');
-        resultDesc = $('result-desc');
-        resultKicker = $('result-kicker');
-        resultMedia = $('result-media');
-        resultVideo = $('result-video');
-        resultMediaLabel = $('result-media-label');
-        actRespin = $('act-respin');
-        actValidate = $('act-validate');
-        gsMinus = $('gs-minus');
-        gsPlus = $('gs-plus');
-        gsValue = $('gs-value');
-        gsStart = $('gs-start');
-        sumList = $('sum-list');
-        sumTotal = $('sum-total');
-        sumPay = $('sum-pay');
-        sumRestart = $('sum-restart');
-        payNames = $('pay-names');
-        payCount = $('pay-count');
-        payResult = $('pay-result');
+        var h=new Date().getHours();
+        period = h<11?'breakfast':(h<17?'lunch':'dinner');
 
-        if (!canvas || !modal || !fab) return;
-        ctx = canvas.getContext('2d');
-        MENU = collectMenu();
+        bind();
+        syncChips();
 
-        var h = new Date().getHours();
-        state.period = h < 11 ? 'breakfast' : (h < 17 ? 'lunch' : 'dinner');
-
-        bindEvents();
-        syncPeriodChips();
-
-        window.addEventListener('resize', debounce(sizeCanvas, 180));
-        if (typeof window.ResizeObserver === 'function') {
-            new ResizeObserver(debounce(sizeCanvas, 120)).observe(frame);
-        }
-        if (typeof MutationObserver === 'function') {
-            new MutationObserver(function () { draw(); })
-                .observe(document.body, { attributes: true, attributeFilter: ['class'] });
-        }
-        if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
-            document.fonts.ready.then(function () { draw(); }).catch(function () {});
-        }
+        window.addEventListener('resize', debounce(sizeCanvas,180));
+        if (typeof window.ResizeObserver==='function') new ResizeObserver(debounce(sizeCanvas,120)).observe(frame);
+        if (typeof MutationObserver==='function') new MutationObserver(function(){draw();}).observe(document.body,{attributes:true,attributeFilter:['class']});
+        if (document.fonts && document.fonts.ready && document.fonts.ready.then) document.fonts.ready.then(function(){draw();}).catch(function(){});
     }
 
-    function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+    function debounce(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms);};}
 
-    /* --------------------------------------------------------- Événements --- */
-
-    function bindEvents() {
-        fab.addEventListener('click', openModal);
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
-
-        Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
-            b.addEventListener('click', function () { chooseMode(b.getAttribute('data-mode')); });
+    function bind(){
+        fab.addEventListener('click', open);
+        closeBtn.addEventListener('click', close);
+        modal.addEventListener('click', function(e){ if(e.target===modal) close(); });
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'&&modal.classList.contains('open')) close(); });
+        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function(c){
+            c.addEventListener('click', function(){ if(!spinning) setPeriod(c.getAttribute('data-period')); });
         });
-        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function (c) {
-            c.addEventListener('click', function () { if (!spinning) setPeriod(c.getAttribute('data-period')); });
+        spinBtn.addEventListener('click', function(){ spinCombo(false); });
+        hub.addEventListener('click', function(){ spinCombo(false); });
+        actRespin.addEventListener('click', function(){ spinCombo(true); });
+        actLocate.addEventListener('click', locate);
+        comboVideo.addEventListener('error', function(){ comboMedia.classList.remove('has-video'); });
+    }
+
+    function open(){ modal.classList.add('open'); document.body.style.overflow='hidden'; setTimeout(sizeCanvas,60); }
+    function close(){ modal.classList.remove('open'); document.body.style.overflow=''; if(comboVideo) comboVideo.pause(); }
+
+    function setPeriod(p){ if(!PERIODS[p]) return; period=p; syncChips(); }
+    function syncChips(){
+        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function(c){
+            c.classList.toggle('active', c.getAttribute('data-period')===period);
         });
-
-        gsMinus.addEventListener('click', function () { setGroupSize(state.groupSize - 1); });
-        gsPlus.addEventListener('click', function () { setGroupSize(state.groupSize + 1); });
-        gsStart.addEventListener('click', startGroup);
-
-        spinBtn.addEventListener('click', function () { spinDish(false); });
-        hub.addEventListener('click', function () { spinDish(false); });
-        actRespin.addEventListener('click', function () { spinDish(true); });
-        actValidate.addEventListener('click', validateCurrent);
-
-        sumPay.addEventListener('click', openPay);
-        sumRestart.addEventListener('click', function () { resetTable(); showScreen('mode'); });
-
-        Array.prototype.forEach.call(payCount.querySelectorAll('.paycount-btn'), function (b) {
-            b.addEventListener('click', function () {
-                state.payersNeeded = parseInt(b.getAttribute('data-count'), 10) || 1;
-                Array.prototype.forEach.call(payCount.querySelectorAll('.paycount-btn'), function (x) {
-                    x.classList.toggle('is-active', x === b);
-                });
-            });
-        });
-        paySpinBtn.addEventListener('click', spinPay);
-
-        resultVideo.addEventListener('error', function () { resultMedia.classList.remove('has-video'); });
+        if(hintEl) hintEl.textContent=candidatesFor(period).length+' plats en jeu · '+PERIODS[period].label;
     }
 
-    /* ------------------------------------------------------ Ouverture modal --- */
-
-    function openModal() {
-        modal.classList.add('open');
-        document.body.style.overflow = 'hidden';
-        showScreen(state.mode ? state.screen : 'mode');
-        setTimeout(sizeCanvas, 60);
-    }
-    function closeModal() {
-        modal.classList.remove('open');
-        document.body.style.overflow = '';
-        if (resultVideo) { resultVideo.pause(); }
-    }
-
-    function showScreen(name) {
-        state.screen = name;
-        Array.prototype.forEach.call(document.querySelectorAll('.rm-screen'), function (s) {
-            s.classList.toggle('is-active', s.getAttribute('data-screen') === name);
-        });
-        var showWheel = (name === 'play' || name === 'pay');
-        wheelShell.classList.toggle('show', showWheel);
-        if (showWheel) setTimeout(sizeCanvas, 40);
-        if (name !== 'play') { hideResult(); }
-    }
-
-    function chooseMode(mode) {
-        state.mode = mode;
-        if (mode === 'solo') {
-            startSolo();
-        } else {
-            showScreen('groupsize');
-        }
-    }
-
-    function setGroupSize(n) {
-        state.groupSize = Math.max(MIN_GROUP, Math.min(MAX_GROUP, n));
-        gsValue.textContent = state.groupSize;
-    }
-
-    function startSolo() {
-        resetTable();
-        state.mode = 'solo';
-        state.players = [{ name: 'Vous', dish: null, confirmed: false }];
-        state.current = 0;
-        enterPlay();
-    }
-
-    function startGroup() {
-        resetTable();
-        state.mode = 'group';
-        state.players = [];
-        for (var i = 0; i < state.groupSize; i++) {
-            state.players.push({ name: 'Joueur ' + (i + 1), dish: null, confirmed: false });
-        }
-        state.current = 0;
-        enterPlay();
-    }
-
-    function resetTable() {
-        state.players = [];
-        state.current = 0;
-        state.takenIds = [];
-        state.payers = [];
-    }
-
-    function enterPlay() {
-        hideResult();
-        showScreen('play');
-        updateTurnInfo();
-    }
-
-    function updateTurnInfo() {
-        if (state.mode === 'solo') {
-            turnInfo.innerHTML = 'À vous de jouer&nbsp;!';
-        } else {
-            var p = state.players[state.current];
-            turnInfo.innerHTML = 'Tour de <strong>' + esc(p.name) + '</strong> · ' + (state.current + 1) + '/' + state.players.length;
-        }
-    }
-
-    function esc(s) {
-        return String(s).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-        });
-    }
-
-    /* ------------------------------------------------------ Période / pool --- */
-
-    function setPeriod(p) {
-        if (!PERIODS[p]) return;
-        state.period = p;
-        syncPeriodChips();
-        updateHint();
-    }
-    function syncPeriodChips() {
-        Array.prototype.forEach.call(document.querySelectorAll('.period-chip'), function (c) {
-            c.classList.toggle('active', c.getAttribute('data-period') === state.period);
-        });
-        updateHint();
-    }
-    function updateHint() {
-        if (hintEl) hintEl.textContent = candidatesFor(state.period).length + ' plats en jeu · ' + PERIODS[state.period].label;
-    }
-
-    function availableDishes(excludeCurrent) {
-        var base = candidatesFor(state.period).filter(function (it) {
-            return state.takenIds.indexOf(it.id) === -1;
-        });
-        if (excludeCurrent && winner && winner.kind === 'main') {
-            base = base.filter(function (it) { return it.id !== winner.id; });
-        }
-        /* Si la table a presque tout pris, on ré-ouvre la carte pour ne pas bloquer */
-        return base.length >= 2 ? base : candidatesFor(state.period);
-    }
-
-    /* ------------------------------------------------------------- La roue --- */
-
-    function buildSlices(win) {
-        if (!pool.length) return [];
-        var n = Math.min(SLICE_COUNT, pool.length);
-        if (!win) return shuffle(pool).slice(0, n);
-        var rest = shuffle(pool.filter(function (x) { return x !== win; })).slice(0, n - 1);
+    /* ------------------------------------------------------------- Roue --- */
+    function buildSlices(win){
+        if(!pool.length) return [];
+        var n=Math.min(SLICE_COUNT,pool.length);
+        if(!win) return shuffle(pool).slice(0,n);
+        var rest=shuffle(pool.filter(function(x){return x!==win;})).slice(0,n-1);
         return shuffle([win].concat(rest));
     }
-
-    function sizeCanvas() {
-        if (!canvas || !frame) return;
-        var css = frame.clientWidth;
-        if (!css) return;
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.round(css * dpr);
-        canvas.height = Math.round(css * dpr);
-        canvas.style.width = css + 'px';
-        canvas.style.height = css + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        radius = css / 2;
-        draw();
+    function sizeCanvas(){
+        if(!canvas||!frame) return;
+        var css=frame.clientWidth; if(!css) return;
+        var dpr=Math.min(window.devicePixelRatio||1,2);
+        canvas.width=Math.round(css*dpr); canvas.height=Math.round(css*dpr);
+        canvas.style.width=css+'px'; canvas.style.height=css+'px';
+        ctx.setTransform(dpr,0,0,dpr,0,0); radius=css/2; draw();
     }
-
-    function palette() {
-        var cs = getComputedStyle(document.body);
-        function v(name, fb) { var val = cs.getPropertyValue(name); return (val && val.trim()) || fb; }
-        return { sliceA: v('--wheel-slice-a', '#F7F1E8'), sliceB: v('--wheel-slice-b', '#C8956C'),
-                 inkA: v('--wheel-ink-a', '#1A1A1A'), inkB: v('--wheel-ink-b', '#241708'),
-                 rim: v('--wheel-rim', '#1A1A1A'), accent: v('--accent', '#C8956C') };
+    function palette(){
+        var cs=getComputedStyle(document.body);
+        function v(n,fb){var x=cs.getPropertyValue(n);return (x&&x.trim())||fb;}
+        return { sliceA:v('--wheel-slice-a','#F7F1E8'), sliceB:v('--wheel-slice-b','#C8956C'),
+                 inkA:v('--wheel-ink-a','#1A1A1A'), inkB:v('--wheel-ink-b','#241708'),
+                 rim:v('--wheel-rim','#1A1A1A'), accent:v('--accent','#C8956C') };
     }
-    function shortLabel(n) { return n.length > 24 ? n.slice(0, 22).trim() + '…' : n; }
-
-    function wrapText(text, maxWidth, maxLines) {
-        var words = String(text).split(' ');
-        var lines = []; var line = ''; var overflow = false;
-        for (var i = 0; i < words.length; i++) {
-            var test = line ? line + ' ' + words[i] : words[i];
-            if (!line || ctx.measureText(test).width <= maxWidth) { line = test; continue; }
-            if (lines.length < maxLines - 1) { lines.push(line); line = words[i]; }
-            else { line = line + ' ' + words.slice(i).join(' '); overflow = true; break; }
+    function shortLabel(n){ return n.length>24?n.slice(0,22).trim()+'…':n; }
+    function wrapText(text,maxW,maxLines){
+        var words=String(text).split(' '), lines=[], line='', overflow=false;
+        for(var i=0;i<words.length;i++){
+            var test=line?line+' '+words[i]:words[i];
+            if(!line||ctx.measureText(test).width<=maxW){line=test;continue;}
+            if(lines.length<maxLines-1){lines.push(line);line=words[i];}
+            else{line=line+' '+words.slice(i).join(' ');overflow=true;break;}
         }
-        if (line) lines.push(line);
-        var lastIdx = lines.length - 1;
-        var last = lines[lastIdx] || '';
-        if (overflow || ctx.measureText(last).width > maxWidth) {
-            var cut = last;
-            while (cut.length > 1 && ctx.measureText(cut + '…').width > maxWidth) cut = cut.slice(0, -1).trim();
-            lines[lastIdx] = cut + '…';
+        if(line)lines.push(line);
+        var last=lines[lines.length-1]||'';
+        if(overflow||ctx.measureText(last).width>maxW){
+            var cut=last;
+            while(cut.length>1&&ctx.measureText(cut+'…').width>maxW)cut=cut.slice(0,-1).trim();
+            lines[lines.length-1]=cut+'…';
         }
         return lines;
     }
-
-    function draw() {
-        if (!ctx || !radius || !slices.length) return;
-        var c = palette();
-        var R = radius, rIn = R * 0.9, n = slices.length, step = (Math.PI * 2) / n;
-        ctx.clearRect(0, 0, R * 2, R * 2);
-        ctx.save(); ctx.translate(R, R); ctx.rotate(rotation * Math.PI / 180);
-
-        ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = c.rim; ctx.fill();
-        var studs = Math.max(16, n * 2);
-        for (var s = 0; s < studs; s++) {
-            var a = (s / studs) * Math.PI * 2;
-            ctx.beginPath(); ctx.arc(Math.cos(a) * R * 0.952, Math.sin(a) * R * 0.952, R * 0.012, 0, Math.PI * 2);
-            ctx.fillStyle = s % 2 === 0 ? c.accent : 'rgba(255,255,255,0.55)'; ctx.fill();
-        }
-        for (var i = 0; i < n; i++) {
-            var a0 = -Math.PI / 2 + i * step, a1 = a0 + step, light = i % 2 === 0;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, rIn, a0, a1); ctx.closePath();
-            ctx.fillStyle = light ? c.sliceA : c.sliceB; ctx.fill();
-            ctx.lineWidth = Math.max(1, R * 0.006); ctx.strokeStyle = 'rgba(200,149,108,0.55)'; ctx.stroke();
-
-            var mid = a0 + step / 2, fs = Math.max(9, Math.min(R * 0.088, 15));
-            ctx.save(); ctx.rotate(mid);
-            var flip = Math.cos(mid) < 0;
-            if (flip) ctx.rotate(Math.PI);
-            ctx.textAlign = flip ? 'left' : 'right';
-            ctx.textBaseline = 'middle';
-            ctx.font = '700 ' + fs.toFixed(1) + 'px Lato, sans-serif';
-            ctx.fillStyle = light ? c.inkA : c.inkB;
-            var pad = R * 0.075, x = flip ? -(rIn - pad) : (rIn - pad);
-            var lines = wrapText(shortLabel(slices[i].name), R * 0.5, 3);
-            var lineH = fs * 1.18, y0 = -((lines.length - 1) * lineH) / 2;
-            for (var l = 0; l < lines.length; l++) ctx.fillText(lines[l], x, y0 + l * lineH);
+    function draw(){
+        if(!ctx||!radius||!slices.length) return;
+        var c=palette(), R=radius, rIn=R*0.9, n=slices.length, step=(Math.PI*2)/n;
+        ctx.clearRect(0,0,R*2,R*2);
+        ctx.save(); ctx.translate(R,R); ctx.rotate(rotation*Math.PI/180);
+        ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.fillStyle=c.rim; ctx.fill();
+        var studs=Math.max(16,n*2);
+        for(var s=0;s<studs;s++){var a=(s/studs)*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*R*0.952,Math.sin(a)*R*0.952,R*0.012,0,Math.PI*2);ctx.fillStyle=s%2===0?c.accent:'rgba(255,255,255,0.55)';ctx.fill();}
+        for(var i=0;i<n;i++){
+            var a0=-Math.PI/2+i*step, a1=a0+step, light=i%2===0;
+            ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,rIn,a0,a1);ctx.closePath();
+            ctx.fillStyle=light?c.sliceA:c.sliceB;ctx.fill();
+            ctx.lineWidth=Math.max(1,R*0.006);ctx.strokeStyle='rgba(200,149,108,0.55)';ctx.stroke();
+            var mid=a0+step/2, fs=Math.max(9,Math.min(R*0.088,15));
+            ctx.save();ctx.rotate(mid);
+            var flip=Math.cos(mid)<0; if(flip)ctx.rotate(Math.PI);
+            ctx.textAlign=flip?'left':'right'; ctx.textBaseline='middle';
+            ctx.font='700 '+fs.toFixed(1)+'px Lato, sans-serif';
+            ctx.fillStyle=light?c.inkA:c.inkB;
+            var pad=R*0.075, x=flip?-(rIn-pad):(rIn-pad);
+            var lines=wrapText(shortLabel(slices[i].name),R*0.5,3);
+            var lineH=fs*1.18, y0=-((lines.length-1)*lineH)/2;
+            for(var l=0;l<lines.length;l++)ctx.fillText(lines[l],x,y0+l*lineH);
             ctx.restore();
         }
-        ctx.beginPath(); ctx.arc(0, 0, rIn, 0, Math.PI * 2);
-        ctx.lineWidth = Math.max(2, R * 0.014); ctx.strokeStyle = c.accent; ctx.stroke();
-        ctx.beginPath(); ctx.arc(0, 0, R * 0.19, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fill();
+        ctx.beginPath();ctx.arc(0,0,rIn,0,Math.PI*2);ctx.lineWidth=Math.max(2,R*0.014);ctx.strokeStyle=c.accent;ctx.stroke();
+        ctx.beginPath();ctx.arc(0,0,R*0.19,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fill();
         ctx.restore();
     }
-
-    function sliceIndexAtPointer() {
-        if (!slices.length) return -1;
-        var step = 360 / slices.length;
-        var a = ((-rotation % 360) + 360) % 360;
-        return Math.floor(a / step) % slices.length;
+    function sliceIndexAtPointer(){
+        if(!slices.length) return -1;
+        var step=360/slices.length, a=((-rotation%360)+360)%360;
+        return Math.floor(a/step)%slices.length;
     }
 
-    function setSpinDisabled(dis) {
-        if (spinBtn) spinBtn.disabled = dis;
-        if (paySpinBtn) paySpinBtn.disabled = dis;
+    /* ------------------------------------------------------------- Spin --- */
+    function spinCombo(isRespin){
+        if(spinning) return;
+        var list=candidatesFor(period);
+        if(isRespin && lastDish) list=list.filter(function(i){return i.id!==lastDish.id;});
+        if(list.length<2) list=candidatesFor(period);
+        beginSpin(list);
     }
 
-    function beginSpin(list, kind, endFn) {
-        if (spinning || !list.length) return;
-        spinning = true;
-        setSpinDisabled(true);
-        wheelKind = kind;
-        onEnd = endFn;
-        pool = list;
-        resultCard.classList.remove('visible');
-
-        if (kind === 'dish') { reel.classList.remove('hidden'); startReel(list); }
-        else { reel.classList.add('hidden'); }
-
-        winner = pickWeighted(list);
-        slices = buildSlices(winner);
-        draw();
-
-        var step = 360 / slices.length;
-        var jitter = (Math.random() * 0.6 - 0.3) * step;
-        var winIndex = slices.indexOf(winner);
-        var target = -((winIndex + 0.5) * step) - jitter;
-        var current = ((rotation % 360) + 360) % 360;
-        var delta = (((target - current) % 360) + 360) % 360;
-        animateTo(rotation + 360 * FULL_TURNS + delta);
+    function beginSpin(list){
+        if(spinning||!list.length) return;
+        spinning=true; spinBtn.disabled=true;
+        comboCard.classList.remove('visible');
+        reel.classList.remove('hidden'); startReel(list);
+        winner=pickWeighted(list);
+        pool=list; slices=buildSlices(winner); draw();
+        var step=360/slices.length, jitter=(Math.random()*0.6-0.3)*step;
+        var winIndex=slices.indexOf(winner);
+        var target=-((winIndex+0.5)*step)-jitter;
+        var current=((rotation%360)+360)%360;
+        var delta=(((target-current)%360)+360)%360;
+        animateTo(rotation+360*FULL_TURNS+delta);
     }
 
-    function animateTo(target) {
-        var from = rotation, distance = target - from;
-        var duration = reduced ? SPIN_MS_REDUCED : SPIN_MS;
-        var start = performance.now();
-        var lastIdx = sliceIndexAtPointer();
-        var pointer = document.querySelector('.wheel-pointer');
-        function step(now) {
-            var p = Math.min(1, (now - start) / duration);
-            var e = 1 - Math.pow(1 - p, 4);
-            rotation = from + distance * e;
-            draw();
-            var idx = sliceIndexAtPointer();
-            if (idx !== lastIdx) {
-                lastIdx = idx;
-                if (pointer) { pointer.classList.remove('tick'); void pointer.offsetWidth; pointer.classList.add('tick'); }
-                if (navigator.vibrate && !reduced) navigator.vibrate(6);
-            }
-            if (p < 1) requestAnimationFrame(step);
-            else { rotation = target; draw(); finishSpin(); }
+    function animateTo(target){
+        var from=rotation, distance=target-from;
+        var duration=reduced?SPIN_MS_REDUCED:SPIN_MS;
+        var start=performance.now();
+        var lastIdx=sliceIndexAtPointer();
+        var pointer=document.querySelector('.wheel-pointer');
+        function step(now){
+            var p=Math.min(1,(now-start)/duration);
+            var e=1-Math.pow(1-p,4);
+            rotation=from+distance*e; draw();
+            var idx=sliceIndexAtPointer();
+            if(idx!==lastIdx){lastIdx=idx;
+                if(pointer){pointer.classList.remove('tick');void pointer.offsetWidth;pointer.classList.add('tick');}
+                if(navigator.vibrate&&!reduced)navigator.vibrate(6);}
+            if(p<1)requestAnimationFrame(step);
+            else{rotation=target;draw();finish();}
         }
         requestAnimationFrame(step);
     }
 
-    function startReel(list) {
-        stopReel();
-        if (reduced) return;
-        reelTimer = setInterval(function () {
-            var it = list[Math.floor(Math.random() * list.length)];
-            reelText.textContent = it.name;
-            reelText.classList.remove('rolling'); void reelText.offsetWidth; reelText.classList.add('rolling');
-        }, 95);
+    function startReel(list){
+        stopReel(); if(reduced) return;
+        reelTimer=setInterval(function(){
+            var it=list[Math.floor(Math.random()*list.length)];
+            reelText.textContent=it.name;
+            reelText.classList.remove('rolling');void reelText.offsetWidth;reelText.classList.add('rolling');
+        },95);
     }
-    function stopReel() { if (reelTimer) { clearInterval(reelTimer); reelTimer = null; } }
+    function stopReel(){ if(reelTimer){clearInterval(reelTimer);reelTimer=null;} }
 
-    function finishSpin() {
-        stopReel();
-        spinning = false;
-        setSpinDisabled(false);
-        if (onEnd) onEnd(winner);
-    }
-
-    /* ------------------------------------------------------- Spin des plats --- */
-
-    function spinDish(isRespin) {
-        if (state.screen !== 'play') return;
-        var list = availableDishes(isRespin);
-        beginSpin(list, 'dish', onDishLand);
-    }
-
-    function onDishLand(item) {
+    function finish(){
+        stopReel(); spinning=false; spinBtn.disabled=false;
         reel.classList.add('hidden');
-        showDishResult(item);
-        if (navigator.vibrate && !reduced) navigator.vibrate([18, 60, 24]);
+        showCombo(winner);
+        if(navigator.vibrate&&!reduced)navigator.vibrate([18,60,24]);
     }
 
-    function hideResult() {
-        resultCard.classList.remove('visible');
-        reel.classList.remove('hidden');
-        reelText.textContent = 'Prêt à tourner la roue';
-        if (resultVideo) { resultVideo.pause(); resultVideo.removeAttribute('src'); resultVideo.load(); }
-        resultMedia.classList.remove('has-video');
-    }
+    /* ----------------------------------------------------------- Combo --- */
+    function showCombo(dish){
+        lastDish=dish;
+        lastDrink=suggestDrink(dish, period);
 
-    function showDishResult(item) {
-        resultKicker.textContent = 'Le hasard a choisi';
-        resultTitle.textContent = item.name;
-        resultPrice.textContent = item.price !== null ? item.price + ' Dh' : '';
-        resultOrigin.textContent = item.sectionName;
-        resultDesc.textContent = item.description || (item.badge
-            ? 'Incontournable de la carte — ' + item.badge + '.'
-            : 'À retrouver dans notre carte ' + item.sectionName + '.');
-        resultMediaLabel.textContent = item.sectionName;
+        comboKicker.textContent='Ton combo idéal · '+PERIODS[period].label;
+        comboDish.textContent=dish.name;
+        comboDishPrice.textContent=dish.price!==null?dish.price+' Dh':'';
+        comboDrink.innerHTML='<i class="fas fa-mug-hot"></i>'+ (lastDrink?lastDrink.name:'');
+        comboDrinkPrice.textContent=lastDrink&&lastDrink.price!==null?lastDrink.price+' Dh':'';
 
-        if (item.video) {
-            resultMedia.classList.add('has-video');
-            if (item.poster) resultVideo.poster = item.poster;
-            resultVideo.src = item.video;
-            resultVideo.load();
-            var p = resultVideo.play();
-            if (p && p.catch) p.catch(function () {});
-        } else {
-            resultMedia.classList.remove('has-video');
-            resultVideo.pause(); resultVideo.removeAttribute('src'); resultVideo.load();
+        var total=(dish.price||0)+(lastDrink&&lastDrink.price!==null?lastDrink.price:0);
+        comboTotal.textContent=total+' Dh';
+        comboMediaLabel.textContent=dish.sectionName;
+
+        if(dish.video){
+            comboMedia.classList.add('has-video');
+            if(dish.poster)comboVideo.poster=dish.poster;
+            comboVideo.src=dish.video; comboVideo.load();
+            var p=comboVideo.play(); if(p&&p.catch)p.catch(function(){});
+        }else{
+            comboMedia.classList.remove('has-video');
+            comboVideo.pause(); comboVideo.removeAttribute('src'); comboVideo.load();
         }
 
-        actValidate.innerHTML = state.mode === 'group'
-            ? '<i class="fas fa-check"></i> Valider &amp; Suivant'
-            : '<i class="fas fa-check"></i> C\'est choisi !';
-
-        resultCard.classList.remove('visible'); void resultCard.offsetWidth; resultCard.classList.add('visible');
+        comboCard.classList.remove('visible'); void comboCard.offsetWidth; comboCard.classList.add('visible');
     }
 
-    function validateCurrent() {
-        if (!winner || winner.kind !== 'main') return;
-        if (state.mode === 'solo') { closeModal(); return; }
-
-        var player = state.players[state.current];
-        player.dish = winner;
-        player.confirmed = true;
-        if (state.takenIds.indexOf(winner.id) === -1) state.takenIds.push(winner.id);
-        state.current++;
-
-        if (state.current < state.players.length) {
-            hideResult();
-            updateTurnInfo();
-        } else {
-            buildSummary();
-            showScreen('summary');
-        }
+    function locate(){
+        if(!lastDish||!lastDish.el) return;
+        close();
+        lastDish.el.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+        lastDish.el.classList.remove('roulette-flash'); void lastDish.el.offsetWidth; lastDish.el.classList.add('roulette-flash');
+        setTimeout(function(){ if(lastDish&&lastDish.el)lastDish.el.classList.remove('roulette-flash'); },2600);
     }
 
-    /* ---------------------------------------------------------- Résumé table --- */
-
-    function tableTotal() {
-        var t = 0;
-        state.players.forEach(function (p) { if (p.dish && p.dish.price !== null) t += p.dish.price; });
-        return t;
-    }
-
-    function buildSummary() {
-        sumList.innerHTML = '';
-        state.players.forEach(function (p, i) {
-            var li = document.createElement('li');
-            li.style.animationDelay = (i * 0.08) + 's';
-            var price = p.dish && p.dish.price !== null ? p.dish.price + ' Dh' : '—';
-            li.innerHTML = '<span class="sum-player">' + esc(p.name) + '</span>' +
-                           '<span class="sum-dish">' + esc(p.dish ? p.dish.name : '—') + '</span>' +
-                           '<span class="sum-price">' + price + '</span>';
-            sumList.appendChild(li);
-        });
-        sumTotal.textContent = tableTotal() + ' Dh';
-    }
-
-    /* ------------------------------------------------------------- Qui paye --- */
-
-    function openPay() {
-        state.payers = [];
-        payResult.innerHTML = '';
-        buildPayNames();
-        showScreen('pay');
-    }
-
-    function buildPayNames() {
-        payNames.innerHTML = '';
-        state.players.forEach(function (p) {
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.value = p.name;
-            input.setAttribute('data-player', p.name);
-            input.setAttribute('aria-label', 'Nom du participant');
-            payNames.appendChild(input);
-        });
-    }
-
-    function currentNames() {
-        var names = [];
-        Array.prototype.forEach.call(payNames.querySelectorAll('input'), function (inp, i) {
-            var v = inp.value.trim() || ('Joueur ' + (i + 1));
-            names.push({ name: v, video: null });
-        });
-        return names;
-    }
-
-    function spinPay() {
-        if (state.screen !== 'pay') return;
-        var remaining = currentNames().filter(function (n) { return state.payers.indexOf(n.name) === -1; });
-        if (!remaining.length) return;
-        payResult.innerHTML = '<span>La roue tourne…</span>';
-        beginSpin(remaining, 'names', onNameLand);
-    }
-
-    function onNameLand(item) {
-        state.payers.push(item.name);
-        var need = Math.min(state.payersNeeded, currentNames().length);
-
-        if (state.payers.length < need) {
-            payResult.innerHTML = '<span class="win">' + esc(item.name) + '</span> paye… encore un tour&nbsp;!';
-            return;
-        }
-
-        var total = tableTotal();
-        var share = need > 0 ? Math.round(total / need) : total;
-        var msg = state.payers.length === 1
-            ? '<span class="win">' + esc(state.payers[0]) + '</span> paye l\'addition&nbsp;!'
-            : '<span class="win">' + esc(state.payers.join(' & ')) + '</span> se partagent l\'addition&nbsp;!';
-        payResult.innerHTML = msg + '<br><small>' + share + ' Dh / personne</small>';
-        confetti();
-        if (navigator.vibrate && !reduced) navigator.vibrate([30, 60, 30, 60, 60]);
-    }
-
-    function confetti() {
-        var host = payResult;
-        var colors = ['#C8956C', '#F7F1E8', '#2ECC71', '#E67E22', '#FFFFFF'];
-        for (var i = 0; i < 40; i++) {
-            var piece = document.createElement('span');
-            piece.className = 'confetti-piece';
-            piece.style.left = (Math.random() * 100) + '%';
-            piece.style.background = colors[i % colors.length];
-            piece.style.animationDuration = (1 + Math.random() * 1.4) + 's';
-            piece.style.animationDelay = (Math.random() * 0.3) + 's';
-            host.appendChild(piece);
-            (function (el) { setTimeout(function () { el.remove(); }, 3200); })(piece);
-        }
-    }
-
-    /* ------------------------------------------------------------- Démarrage --- */
-
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 
-    /* Exposé pour les tests / la console */
-    window.LeManoirRoulette = {
-        get menu()     { return MENU; },
-        get state()    { return state; },
-        get pool()     { return pool; },
-        get slices()   { return slices; },
-        get winner()   { return winner; },
-        get rotation() { return rotation; },
-        get spinning() { return spinning; },
-        pointerIndex:  sliceIndexAtPointer,
-        candidatesFor: candidatesFor,
-        open:          openModal,
-        close:         closeModal,
-        chooseMode:    chooseMode,
-        setGroupSize:  setGroupSize,
-        startGroup:    startGroup,
-        spinDish:      spinDish,
-        validate:      validateCurrent,
-        openPay:       openPay,
-        spinPay:       spinPay,
-        setPeriod:     setPeriod
+    window.LeManoirRoulette={
+        get menu(){return MENU;},
+        get pool(){return pool;},
+        get slices(){return slices;},
+        get winner(){return winner;},
+        get rotation(){return rotation;},
+        get spinning(){return spinning;},
+        get period(){return period;},
+        get lastDrink(){return lastDrink;},
+        pointerIndex:sliceIndexAtPointer,
+        candidatesFor:candidatesFor,
+        suggestDrink:suggestDrink,
+        open:open, close:close, setPeriod:setPeriod, spin:spinCombo
     };
 })();
