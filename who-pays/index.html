@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title data-i18n="meta.title.who">Qui Paye ? - Le Manoir</title>
+    <meta name="description" content="Qui paye au Manoir ? Ajoutez 2 à 8 joueurs et laissez la roue trancher.">
+    <meta name="theme-color" content="#1A1A1A">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="stylesheet" href="../shared/hub.css?v=4">
+    <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body data-game="who">
+
+    <nav class="hub-nav" aria-label="Navigation des jeux">
+        <div class="hub-nav-inner">
+            <a class="hub-back" href="../index.html" aria-label="Retour au menu principal">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                <span data-i18n="hub.back">Retour au Menu</span>
+            </a>
+            <div class="hub-links">
+                <a class="hub-link" href="../combo-ideal/" data-game="combo"><span class="hl-full"><span aria-hidden="true">🎰 </span><span data-i18n="hub.combo">Combo Idéal</span></span><span class="hl-short"><span aria-hidden="true">🎰 </span><span data-i18n="hub.combo.short">Combo</span></span></a>
+                <a class="hub-link" href="../who-pays/" data-game="who"><span class="hl-full"><span aria-hidden="true">👥 </span><span data-i18n="hub.who">Qui Paye ?</span></span><span class="hl-short"><span aria-hidden="true">👥 </span><span data-i18n="hub.who.short">Qui Paye</span></span></a>
+                <a class="hub-link" href="../quiz/" data-game="quiz"><span class="hl-full"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz">Test de Personnalité</span></span><span class="hl-short"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz.short">Test</span></span></a>
+            </div>
+            <button class="hub-dark-toggle" aria-label="Toggle dark mode" data-i18n-title="aria.dark"><i class="fas fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <main class="wp-main">
+        <!-- Écran 1 : ajout des joueurs -->
+        <section class="wp-screen" id="wp-setup">
+            <div class="rm-header">
+                <span class="section-icon"><i class="fas fa-users"></i></span>
+                <h1 data-i18n="who.title">Qui Paye ?</h1>
+                <div class="section-divider"></div>
+                <p class="rm-tagline" data-i18n="who.tagline">Ajoutez 2 à 8 joueurs. La roue tranchera, sans appel.</p>
+            </div>
+
+            <div class="wp-players">
+                <form class="wp-add-row" id="wp-add-form">
+                    <input type="text" id="wp-name-input" maxlength="16" placeholder="Nom du joueur" data-i18n-ph="who.input-ph" autocomplete="off" aria-label="Nom du joueur">
+                    <button type="submit" class="wp-add-btn" aria-label="Ajouter le joueur" data-i18n-title="who.add"><i class="fas fa-plus"></i></button>
+                </form>
+                <div class="wp-count" id="wp-count">0 / 8 joueurs</div>
+                <ul class="wp-chips" id="wp-chips" aria-live="polite"></ul>
+                <button type="button" class="wp-clear" id="wp-clear" data-i18n="who.clear"><i class="fas fa-trash-can"></i> Tout effacer</button>
+            </div>
+
+            <div class="rm-actions">
+                <button type="button" class="spin-btn" id="wp-start" disabled><i class="fas fa-play"></i><span data-i18n="who.start">Lancer la roue</span></button>
+            </div>
+            <p class="roulette-hint" id="wp-hint" data-i18n="who.hint.need2">Ajoutez au moins 2 joueurs</p>
+        </section>
+
+        <!-- Écran 2 : la roue -->
+        <section class="wp-screen hidden" id="wp-wheel">
+            <div class="rm-header">
+                <span class="section-icon"><i class="fas fa-bullseye"></i></span>
+                <h1 data-i18n="who.wheel.title">La roue du compte</h1>
+                <div class="section-divider"></div>
+            </div>
+
+            <div class="wheel-shell show" id="wheel-shell">
+                <div class="wheel-pointer" aria-hidden="true"></div>
+                <div class="wheel-frame">
+                    <canvas id="wp-canvas" aria-hidden="true"></canvas>
+                    <button type="button" class="wheel-hub" id="wp-hub" aria-label="Lancer la roue">
+                        <span class="wheel-hub-label" data-i18n="who.wheel.go">GO</span>
+                        <span class="wheel-hub-sub" data-i18n="who.wheel.gosub">Paye !</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="rm-actions">
+                <button type="button" class="spin-btn" id="wp-spin"><i class="fas fa-arrows-rotate"></i><span data-i18n="who.spin">Lancer</span></button>
+            </div>
+            <p class="roulette-hint" id="wp-wheel-hint"></p>
+            <p class="wp-switch"><a href="#" id="wp-back-setup" data-i18n="who.change"><i class="fas fa-users"></i> Changer les joueurs</a></p>
+        </section>
+    </main>
+
+    <!-- Résultat -->
+    <div class="wp-result" id="wp-result" role="dialog" aria-modal="true" aria-labelledby="wp-result-name">
+        <div class="wp-result-card">
+            <span class="wp-result-emoji" aria-hidden="true">💸</span>
+            <h2 id="wp-result-name"></h2>
+            <p id="wp-result-joke"></p>
+            <div class="wp-result-actions">
+                <button type="button" class="spin-btn" id="wp-share" data-i18n="story.share"><i class="fas fa-camera"></i> Partager en Story</button>
+                <button type="button" class="result-btn" id="wp-respin" data-i18n="who.result.respin"><i class="fas fa-arrows-rotate"></i> Rejouer</button>
+                <button type="button" class="result-btn ghost" id="wp-change" data-i18n="who.change"><i class="fas fa-users"></i> Changer les joueurs</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <a href="../index.html" data-i18n="footer.view-full-menu">Voir le menu complet de <strong>Le Manoir</strong> <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="../shared/i18n.js?v=4"></script>
+    <script src="../shared/hub.js?v=4"></script>
+    <script src="../shared/story.js?v=4"></script>
+    <script src="script.js?v=4"></script>
+</body>
+</html>

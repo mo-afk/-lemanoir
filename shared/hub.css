@@ -1,0 +1,482 @@
+/* ============================================================================
+   LE MANOIR — HUB PARTAGÉ (combo-ideal · who-pays · quiz)
+   Navigation commune, mode sombre, roue, boutons, carte Story 9:16.
+   ============================================================================ */
+
+:root {
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+    --primary-text: #1A1A1A;
+    --secondary-text: #555;
+    --background: #ffffff;
+    --surface: #FFFFFF;
+    --border-color: #EAEAEA;
+    --accent: #C8956C;
+    --accent-dark: #A9764C;
+    --accent-light: rgba(200, 149, 108, 0.1);
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 35px rgba(0, 0, 0, 0.15);
+    --radius: 14px;
+    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --wheel-slice-a: #F7F1E8;
+    --wheel-slice-b: #C8956C;
+    --wheel-ink-a: #1A1A1A;
+    --wheel-ink-b: #241708;
+    --wheel-rim: #1A1A1A;
+    --wheel-rim-glow: rgba(200, 149, 108, 0.35);
+}
+
+body.dark-mode {
+    --primary-text: #F0F0F0;
+    --secondary-text: #AAAAAA;
+    --background: #121212;
+    --surface: #1E1E1E;
+    --border-color: #2A2A2A;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 12px 35px rgba(0, 0, 0, 0.5);
+    --wheel-slice-a: #262219;
+    --wheel-slice-b: #A97C4E;
+    --wheel-ink-a: #F0F0F0;
+    --wheel-ink-b: #180F06;
+    --wheel-rim: #0D0C0B;
+    --wheel-rim-glow: rgba(200, 149, 108, 0.28);
+}
+
+/* ==========================================================================
+   HUB NAV — barre de navigation commune aux 3 mini-jeux
+   ========================================================================== */
+.hub-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: background-color var(--transition), border-color var(--transition);
+}
+
+.hub-nav-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    padding-top: calc(0.55rem + env(safe-area-inset-top, 0px));
+}
+
+.hub-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0.55rem 1.1rem 0.55rem 0.85rem;
+    border-radius: 50px;
+    border: 2px solid var(--border-color);
+    background: var(--surface);
+    color: var(--primary-text);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    transition: all var(--transition);
+}
+
+.hub-back i { color: var(--accent); font-size: 0.95rem; transition: transform var(--transition); }
+.hub-back:hover { border-color: var(--accent); background: var(--accent-light); transform: translateX(-2px); }
+.hub-back:hover i { transform: translateX(-3px); }
+.hub-back:active { transform: scale(0.97); }
+
+.hub-links {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+}
+
+.hub-links::-webkit-scrollbar { display: none; }
+
+.hub-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 0.45rem 0.85rem;
+    border-radius: 50px;
+    border: 2px solid var(--border-color);
+    background: var(--surface);
+    color: var(--secondary-text);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all var(--transition);
+}
+
+.hub-link:hover { border-color: var(--accent); color: var(--primary-text); transform: translateY(-1px); }
+.hub-link.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(200, 149, 108, 0.35);
+}
+
+.hub-dark-toggle {
+    flex-shrink: 0;
+    background: none;
+    border: 2px solid var(--border-color);
+    color: var(--primary-text);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    transition: all var(--transition);
+}
+
+.hub-dark-toggle:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+body.dark-mode .hub-dark-toggle i::before { content: "\f185"; }
+
+@media (max-width: 480px) {
+    .hub-nav-inner { gap: 0.4rem; padding-left: 0.55rem; padding-right: 0.55rem; }
+    .hub-back { padding: 0.55rem 0.85rem; }
+    .hub-back .hl-full { display: none; }
+    .hub-back { padding-left: 1.05rem; padding-right: 1.05rem; }
+    .hub-link { padding: 0.4rem 0.7rem; font-size: 0.75rem; }
+    .hub-link .hl-full { display: none; }
+    .hub-link .hl-short { display: inline; }
+}
+
+@media (min-width: 481px) {
+    .hub-link .hl-short { display: none; }
+}
+
+/* ==========================================================================
+   ROUE — composants partagés (combo-ideal · who-pays)
+   ========================================================================== */
+.wheel-shell {
+    position: relative;
+    width: min(100%, 320px);
+    margin: 0 auto;
+    display: none;
+}
+
+.wheel-shell.show { display: block; }
+
+.wheel-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 0 6px var(--wheel-rim-glow), 0 0 0 9px rgba(200, 149, 108, 0.12), 0 22px 50px rgba(0, 0, 0, 0.22);
+}
+
+.wheel-frame canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    border-radius: 50%;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: 50% 0;
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 26px solid var(--accent);
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+    z-index: 3;
+}
+
+.wheel-pointer.tick { animation: hubPointerTick 0.11s ease-out; }
+
+@keyframes hubPointerTick {
+    0% { transform: translateX(-50%) rotate(0); }
+    45% { transform: translateX(-50%) rotate(-13deg); }
+    100% { transform: translateX(-50%) rotate(0); }
+}
+
+.wheel-hub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 26%;
+    aspect-ratio: 1/1;
+    min-width: 70px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    background: linear-gradient(145deg, #302A24, #141210);
+    color: var(--accent);
+    display: grid;
+    place-items: center;
+    align-content: center;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4), inset 0 2px 6px rgba(255, 255, 255, 0.12);
+    transition: transform var(--transition);
+}
+
+.wheel-hub:hover { transform: translate(-50%, -50%) scale(1.06); }
+.wheel-hub-label { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: 2px; line-height: 1; }
+.wheel-hub-sub { font-size: 0.52rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-top: 3px; }
+
+/* ---------- Boutons partagés ---------- */
+.spin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 48px;
+    padding: 0.95rem 1.9rem;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(200, 149, 108, 0.35);
+    transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+
+.spin-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(200, 149, 108, 0.45); }
+.spin-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.roulette-hint {
+    text-align: center;
+    font-size: 0.7rem;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--secondary-text);
+    opacity: 0.85;
+    width: 100%;
+}
+
+/* ==========================================================================
+   CARTE STORY 9:16 — aperçu + export (Instagram / WhatsApp)
+   Dimensions de référence : 360 x 640 (exportée en 1080 x 1920)
+   Couleurs fixes (non liées au dark mode) : toujours la charte Le Manoir.
+   ========================================================================== */
+.lm-story-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.lm-story-overlay.open { opacity: 1; visibility: visible; }
+
+.lm-story-close {
+    position: absolute;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    z-index: 2;
+    transition: all var(--transition);
+}
+
+.lm-story-close:hover { background: rgba(255, 255, 255, 0.25); transform: rotate(90deg); }
+
+.lm-story-fit { overflow: visible; }
+
+.lm-story-scale {
+    transform-origin: top left;
+    transition: transform 0.3s ease;
+}
+
+.lm-story-card {
+    position: relative;
+    width: 360px;
+    height: 640px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #F7F1E8;
+    color: #1A1A1A;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Lato', sans-serif;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+}
+
+.lm-sc-bar { height: 6px; background: linear-gradient(90deg, var(--accent, #C8956C), #A9764C); flex-shrink: 0; }
+
+.lm-sc-top { text-align: center; padding: 20px 24px 0; flex-shrink: 0; }
+.lm-sc-logo { font-family: 'Playfair Display', serif; font-size: 31px; font-weight: 700; letter-spacing: 2px; line-height: 1.1; }
+.lm-sc-logo-sub { font-size: 9px; font-weight: 700; letter-spacing: 4.5px; text-transform: uppercase; color: #A9764C; margin-top: 3px; }
+.lm-sc-divider { width: 40px; height: 2px; background: #C8956C; margin: 10px auto 0; border-radius: 2px; }
+
+.lm-sc-kicker {
+    margin-top: 24px;
+    text-align: center;
+    padding: 0 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #A9764C;
+}
+
+.lm-sc-emoji { text-align: center; font-size: 54px; line-height: 1.15; margin-top: 12px; }
+
+.lm-sc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 31px;
+    font-weight: 700;
+    line-height: 1.16;
+    text-align: center;
+    margin-top: 10px;
+    padding: 0 22px;
+}
+
+.lm-sc-sub {
+    text-align: center;
+    font-size: 14px;
+    color: #6B5B4A;
+    margin-top: 8px;
+    padding: 0 30px;
+    line-height: 1.45;
+}
+
+.lm-sc-rows { margin-top: auto; padding: 0 26px; flex-shrink: 0; }
+
+.lm-sc-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(26, 26, 26, 0.18);
+    font-size: 15px;
+}
+
+.lm-sc-row .lbl { color: #3A3128; font-weight: 400; }
+.lm-sc-row .val { font-weight: 700; color: #A9764C; white-space: nowrap; }
+
+.lm-sc-row.total {
+    background: rgba(200, 149, 108, 0.16);
+    margin: 10px -26px 0;
+    padding: 12px 26px;
+    border-bottom: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+.lm-sc-row.total .lbl, .lm-sc-row.total .val { color: #8A5A2B; }
+.lm-sc-row.total .val { font-size: 18px; }
+
+.lm-sc-foot {
+    text-align: center;
+    padding: 16px 24px 20px;
+    margin-top: 16px;
+    border-top: 1px solid rgba(26, 26, 26, 0.12);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8A6A4E;
+    line-height: 1.7;
+    flex-shrink: 0;
+}
+.lm-sc-foot .lm-sc-ig { color: #A9764C; }
+
+/* ---------- Actions de partage ---------- */
+.lm-story-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.lm-story-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    border: 2px solid #C8956C;
+    background: linear-gradient(135deg, #C8956C, #A9764C);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.lm-story-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(200, 149, 108, 0.45); }
+.lm-story-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+.lm-story-btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.4); }
+.lm-story-btn.ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ==========================================================================
+   RTL (العربية) — hub des jeux + carte story 9:16
+   ========================================================================== */
+[dir="rtl"] body {
+    font-family: var(--font-body), Tahoma, 'Geeza Pro', 'Arabic Typesetting', sans-serif;
+}
+
+/* La liaison des lettres arabes est cassée par letter-spacing : toujours 0 */
+[dir="rtl"] * { letter-spacing: 0 !important; }
+
+/* Retour : flèche vers la droite + décalage miroir */
+[dir="rtl"] .hub-back { padding: 0.55rem 0.85rem 0.55rem 1.1rem; }
+[dir="rtl"] .hub-back i { transform: scaleX(-1); }
+[dir="rtl"] .hub-back:hover { transform: translateX(2px); }
+[dir="rtl"] .hub-back:hover i { transform: scaleX(-1) translateX(-3px); }
+
+/* Carte story : bouton de fermeture en miroir */
+[dir="rtl"] .lm-story-close { right: auto; left: 12px; }
+
+/* Pied de page : flèche en miroir */
+[dir="rtl"] .page-footer a i { transform: rotate(180deg); }
