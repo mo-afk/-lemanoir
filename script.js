@@ -1,58 +1,177 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.querySelector('.loader-overlay');
+    let currentModalCard = null;
 
     /* ---------------------------------------------------------------
-       Localisation du menu (FR/AR/EN)
-       Noms + descriptions/ingrédients résolus depuis shared/menu-data.js
-       selon la langue active (localStorage 'lemanoir_lang'), avec repli
-       gracieux sur le français / le nom d'origine.
+       Résolution des éléments de menu depuis shared/menu-data.js
        --------------------------------------------------------------- */
-    function cardItem(card) {
+    function findItemForCard(card) {
+        if (!card || typeof LM_MENU === 'undefined' || !LM_MENU.items) return null;
         const sec = card.closest('.menu-section');
+        const secId = sec ? sec.id : null;
         const h3 = card.querySelector('h3');
-        if (!sec || !h3 || typeof LM_MENU === 'undefined') return null;
-        if (!card.dataset.itemName) card.dataset.itemName = h3.textContent.trim();
-        return LM_MENU.findBy(sec.id, card.dataset.itemName);
+        if (!h3) return null;
+
+        if (!card.dataset.originalName) {
+            card.dataset.originalName = h3.textContent.trim();
+        }
+        const searchName = card.dataset.originalName;
+
+        // 1. Recherche exacte par section + nom
+        if (secId) {
+            const match = LM_MENU.findBy(secId, searchName);
+            if (match) return match;
+        }
+
+        // 2. Recherche tolérante (insensible à la casse) dans la section
+        const norm = (s) => (s || '').trim().toLowerCase();
+        const target = norm(searchName);
+        for (let i = 0; i < LM_MENU.items.length; i++) {
+            const it = LM_MENU.items[i];
+            if (secId && it.sectionId === secId) {
+                if (norm(it.name) === target || norm(it.nameEn) === target) return it;
+            }
+        }
+
+        // 3. Recherche globale sur tous les items
+        for (let i = 0; i < LM_MENU.items.length; i++) {
+            const it = LM_MENU.items[i];
+            if (norm(it.name) === target || norm(it.nameEn) === target) return it;
+        }
+
+        return null;
     }
 
-    function localizeCards() {
+    /* ---------------------------------------------------------------
+       Rendu & Injection des Médias (Vidéos / Posters) depuis menu-data.js
+       Restaure l'affichage visuel complet de toutes les cartes du menu.
+       --------------------------------------------------------------- */
+    function renderCards() {
         if (typeof LM_MENU === 'undefined') return;
-        document.querySelectorAll('.menu-item-card, .popular-card').forEach((card) => {
-            const item = cardItem(card);
+
+        // Toutes les cartes du menu (suggestions populaires et grille complète)
+        const allCards = document.querySelectorAll('.popular-card, .menu-card, .menu-item-card');
+
+        allCards.forEach((card) => {
+            const item = findItemForCard(card);
             if (!item) return;
+
+            // 1. Mise à jour des textes localisés
             const h3 = card.querySelector('h3');
             if (h3) h3.textContent = LM_MENU.displayName(item);
+
             const p = card.querySelector('p');
             if (p) {
                 const d = LM_MENU.displayDesc(item);
                 if (d) p.textContent = d;
             }
+
+            const detail = LM_MENU.displayDetail(item);
+            if (detail) {
+                card.dataset.description = detail;
+            }
+
+            // 2. Injection et synchronisation des médias (vidéo & poster)
+            const isMediaCard = card.classList.contains('popular-card') || card.classList.contains('menu-card') || card.querySelector('video');
+
+            if (isMediaCard && (item.video || item.poster)) {
+                let video = card.querySelector('video');
+
+                if (!video) {
+                    video = document.createElement('video');
+                    video.className = 'lazy-video';
+                    video.muted = true;
+                    video.loop = true;
+                    video.setAttribute('playsinline', '');
+                    video.playsInline = true;
+
+                    const cardContent = card.querySelector('.card-content');
+                    if (cardContent) {
+                        card.insertBefore(video, cardContent);
+                    } else {
+                        card.insertBefore(video, card.firstChild);
+                    }
+                }
+
+                // Configuration du poster (affichage instantané)
+                if (item.poster) {
+                    video.poster = item.poster;
+                    video.setAttribute('poster', item.poster);
+                }
+
+                video.preload = 'metadata';
+                video.classList.add('loaded');
+
+                // Configuration de la source vidéo
+                if (item.video) {
+                    let source = video.querySelector('source');
+                    if (!source) {
+                        source = document.createElement('source');
+                        source.type = 'video/webm';
+                        video.appendChild(source);
+                    }
+                    source.src = item.video;
+                    source.dataset.src = item.video;
+                    if (!video.src || video.src !== item.video) {
+                        video.src = item.video;
+                    }
+                }
+            }
         });
+
+        // Mise à jour de la modale si actuellement ouverte
+        if (currentModalCard && modal && modal.classList.contains('active')) {
+            const item = findItemForCard(currentModalCard);
+            if (item) {
+                if (modalTitle) modalTitle.textContent = LM_MENU.displayName(item);
+                if (modalDescription) modalDescription.textContent = LM_MENU.displayDetail(item) || currentModalCard.dataset.description || '';
+            }
+        }
     }
 
-    localizeCards();
-    document.addEventListener('languagechange', localizeCards);
+    // Exposition globale pour tests et intégrations
+    window.renderCards = renderCards;
 
+    // Rendu initial des cartes et médias
+    renderCards();
 
-    window.addEventListener('load', () => {
-        if (loader) {
-            setTimeout(() => {
-                loader.classList.add('hidden');
-            }, 2200);
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 2800);
+    // Traduction de la page au chargement
+    if (window.LM_I18N && typeof window.LM_I18N.translatePage === 'function') {
+        window.LM_I18N.translatePage();
+    }
+
+    // Réactualisation au changement de langue
+    document.addEventListener('languagechange', () => {
+        renderCards();
+        const tooltip = document.getElementById('fab-tooltip');
+        if (tooltip && window.LM_I18N && typeof window.LM_I18N.t === 'function') {
+            tooltip.textContent = window.LM_I18N.t('fab.tooltip');
         }
     });
 
-    setTimeout(() => {
+    /* ---------------------------------------------------------------
+       Écran de chargement fluide sans délai artificiel
+       --------------------------------------------------------------- */
+    function dismissLoader() {
         if (loader && !loader.classList.contains('hidden')) {
             loader.classList.add('hidden');
-            setTimeout(() => { loader.style.display = 'none'; }, 600);
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 600);
         }
-    }, 5000);
+    }
 
+    if (document.readyState === 'complete') {
+        dismissLoader();
+    } else {
+        window.addEventListener('load', dismissLoader, { once: true });
+    }
+    setTimeout(dismissLoader, 3000);
+
+    /* ---------------------------------------------------------------
+       Animations AOS
+       --------------------------------------------------------------- */
     if (typeof AOS !== 'undefined') {
         AOS.init({
             duration: 700,
@@ -62,6 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* ---------------------------------------------------------------
+       Mode Sombre
+       --------------------------------------------------------------- */
     const darkModeToggle = document.querySelector('.dark-mode-toggle');
 
     if (localStorage.getItem('darkMode') === 'true') {
@@ -80,6 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /* ---------------------------------------------------------------
+       Navigation par Catégorie
+       --------------------------------------------------------------- */
     function centerActiveLink(activeLink) {
         const navContainer = document.querySelector('.nav-container');
         if (!activeLink || !navContainer) return;
@@ -90,21 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
         navContainer.scrollTo({ left: scrollPosition, behavior: 'smooth' });
     }
 
-    const sliderVideos = document.querySelectorAll('.hero-slider video');
-    let currentVideoIndex = 0;
-
-    if (sliderVideos.length > 1) {
-        setInterval(() => {
-            sliderVideos[currentVideoIndex].classList.remove('active');
-            currentVideoIndex = (currentVideoIndex + 1) % sliderVideos.length;
-            sliderVideos[currentVideoIndex].classList.add('active');
-        }, 6000);
-    }
-
     const navLinks = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('.menu-section');
 
-    const observer = new IntersectionObserver((entries) => {
+    const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const id = entry.target.id;
@@ -122,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         threshold: 0
     });
 
-    sections.forEach(section => observer.observe(section));
+    sections.forEach(section => sectionObserver.observe(section));
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -135,6 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    /* ---------------------------------------------------------------
+       Modal détail produit
+       --------------------------------------------------------------- */
     const popularCards = document.querySelectorAll('.popular-card');
     const modal = document.getElementById('item-modal');
     const modalVideo = document.getElementById('modal-video');
@@ -143,29 +260,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.querySelector('.close-modal');
 
     function openModal(card) {
+        currentModalCard = card;
+        const item = findItemForCard(card);
         const vidEl = card.querySelector('video');
         const sourceEl = card.querySelector('source');
-        const title = card.querySelector('h3')?.innerText || '';
-        const item = cardItem(card);
+        const title = (item ? LM_MENU.displayName(item) : '') || card.querySelector('h3')?.textContent?.trim() || '';
         const description = (item ? LM_MENU.displayDetail(item) : '') || card.dataset.description || '';
 
         const videoSrc =
+            (item && item.video) ||
             (vidEl && (vidEl.currentSrc || vidEl.src)) ||
-            (sourceEl && (sourceEl.currentSrc || sourceEl.dataset.src)) ||
+            (sourceEl && (sourceEl.currentSrc || sourceEl.src || sourceEl.dataset.src)) ||
             '';
 
-        if (modal && modalVideo && videoSrc && title) {
-            modalVideo.src = videoSrc;
-            modalVideo.load();
-            modalTitle.innerText = title;
-            modalDescription.innerText = description;
+        const posterSrc =
+            (item && item.poster) ||
+            (vidEl && (vidEl.poster || vidEl.getAttribute('poster'))) ||
+            '';
+
+        if (modal && modalVideo && title) {
+            if (videoSrc) {
+                modalVideo.src = videoSrc;
+                if (posterSrc) modalVideo.poster = posterSrc;
+                modalVideo.load();
+                modalVideo.play().catch(() => {});
+            }
+            modalTitle.textContent = title;
+            modalDescription.textContent = description;
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            modalVideo.play().catch(e => console.log("Video play prevented:", e));
         }
     }
 
     function closeModal() {
+        currentModalCard = null;
         if (!modal || !modalVideo) return;
         modal.classList.remove('active');
         document.body.style.overflow = '';
@@ -193,52 +321,112 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const backToTop = document.querySelector('.back-to-top');
-
-    if (backToTop) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) {
-                backToTop.classList.add('visible');
-            } else {
-                backToTop.classList.remove('visible');
-            }
-        }, { passive: true });
-
-        backToTop.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-
-    const allCardVideos = document.querySelectorAll('.popular-card video');
+    /* ---------------------------------------------------------------
+       Contrôle fluide de la lecture vidéo au scroll
+       Joue la vidéo lorsqu'elle entre dans le champ et la met en pause hors écran.
+       --------------------------------------------------------------- */
+    const cardVideos = document.querySelectorAll('.popular-card video, .menu-card video');
 
     if ('IntersectionObserver' in window) {
         const videoObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const video = entry.target;
                 if (entry.isIntersecting) {
-                    video.play().catch(() => {});
+                    const source = video.querySelector('source');
+                    if (source && source.dataset.src && (!source.src || source.src !== source.dataset.src)) {
+                        source.src = source.dataset.src;
+                        video.src = source.dataset.src;
+                        if (typeof video.load === 'function') video.load();
+                    }
+                    if (typeof video.play === 'function') {
+                        const playPromise = video.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(() => {});
+                        }
+                    }
                 } else {
-                    video.pause();
+                    if (typeof video.pause === 'function' && !video.paused) {
+                        video.pause();
+                    }
                 }
             });
         }, {
-            rootMargin: '100px',
-            threshold: 0.25
+            rootMargin: '150px 0px',
+            threshold: 0.1
         });
 
-        allCardVideos.forEach(video => videoObserver.observe(video));
+        cardVideos.forEach(v => videoObserver.observe(v));
+    } else {
+        cardVideos.forEach(video => {
+            const source = video.querySelector('source');
+            if (source && source.dataset.src) {
+                source.src = source.dataset.src;
+                video.src = source.dataset.src;
+            }
+            if (typeof video.play === 'function') {
+                video.play().catch(() => {});
+            }
+        });
     }
 
+    /* ---------------------------------------------------------------
+       Scroll Handler Throttled via requestAnimationFrame
+       --------------------------------------------------------------- */
+    const backToTop = document.querySelector('.back-to-top');
     const nav = document.querySelector('.category-nav');
+    let isScrolledPast100 = false;
+    let isScrolledPast500 = false;
+    let scrollTicking = false;
 
-    if (nav) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)';
-            } else {
-                nav.style.boxShadow = '0 2px 10px rgba(0,0,0,0.04)';
+    function handleScroll() {
+        const y = window.scrollY || window.pageYOffset;
+        const over100 = y > 100;
+        const over500 = y > 500;
+
+        if (over100 !== isScrolledPast100) {
+            isScrolledPast100 = over100;
+            if (nav) {
+                nav.classList.toggle('scrolled', over100);
             }
-        }, { passive: true });
+        }
+
+        if (over500 !== isScrolledPast500) {
+            isScrolledPast500 = over500;
+            if (backToTop) {
+                backToTop.classList.toggle('visible', over500);
+            }
+        }
+
+        scrollTicking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!scrollTicking) {
+            requestAnimationFrame(handleScroll);
+            scrollTicking = true;
+        }
+    }, { passive: true });
+
+    if (backToTop) {
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    /* ---------------------------------------------------------------
+       Redirection FAB Tooltip vers le Combo Idéal
+       --------------------------------------------------------------- */
+    const fabTooltip = document.getElementById('fab-tooltip');
+    if (fabTooltip) {
+        fabTooltip.addEventListener('click', () => {
+            window.location.href = 'combo-ideal/index.html';
+        });
+        fabTooltip.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.location.href = 'combo-ideal/index.html';
+            }
+        });
     }
 
 });

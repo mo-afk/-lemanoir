@@ -9,7 +9,6 @@
     'use strict';
 
     var SLICE_COUNT     = 8;
-    var MIN_MAIN_PRICE  = 30;
     var SPIN_MS         = 3600;
     var SPIN_MS_REDUCED = 1100;
     var FULL_TURNS      = 5;
@@ -115,6 +114,7 @@
                 comboDrink.innerHTML = '<i class="fas fa-mug-hot"></i>' + LM_MENU.displayName(lastDrink);
                 comboMediaLabel.textContent = LM_MENU.displaySectionName(lastDish);
             }
+            draw();
         });
     }
 

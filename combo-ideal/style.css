@@ -43,50 +43,6 @@ a, button {
     padding: 1.75rem 1rem 2rem;
 }
 
-.rm-header {
-    text-align: center;
-    margin-bottom: 1.4rem;
-    animation: comboFadeInDown 0.6s ease-out both;
-}
-
-.rm-header h1 {
-    font-family: var(--font-display);
-    font-size: 2.1rem;
-    font-weight: 700;
-    margin: 0.5rem 0 0.5rem;
-}
-
-.rm-tagline {
-    color: var(--secondary-text);
-    font-size: 0.95rem;
-}
-
-.section-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    color: var(--accent);
-    font-size: 1.25rem;
-    margin-bottom: 0.4rem;
-}
-
-.section-divider {
-    width: 50px;
-    height: 3px;
-    background: var(--accent);
-    margin: 0 auto;
-    border-radius: 10px;
-}
-
-@keyframes comboFadeInDown {
-    from { opacity: 0; transform: translate3d(0, -18px, 0); }
-    to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
 .rm-body {
     display: flex;
     flex-direction: column;
@@ -360,7 +316,6 @@ a, button {
    ========================================================================== */
 @media (max-width: 480px) {
     .combo-main { padding: 1.4rem 0.9rem 1.6rem; }
-    .rm-header h1 { font-size: 1.8rem; }
     .combo-body { padding: 1rem 1rem 1.2rem; }
     .combo-line { padding: 0.6rem 0.9rem; }
     .combo-line .combo-name { font-size: 1.05rem; }
@@ -374,21 +329,13 @@ a, button {
 }
 
 @media (max-width: 360px) {
-    .rm-header h1 { font-size: 1.55rem; }
-    .rm-tagline { font-size: 0.82rem; }
     .wheel-shell { width: min(100%, 264px); }
     .spin-btn { padding: 0.9rem 1.3rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .rm-header, .rm-body,
+    .rm-body,
     .result-reel i, .wheel-pointer.tick, .combo-card.visible {
         animation: none;
     }
 }
-
-/* ==========================================================================
-   RTL (العربية) — combo idéal
-   ========================================================================== */
-[dir="rtl"] .combo-line .combo-name { text-align: right; }
-[dir="rtl"] .combo-line.drink .combo-name i { margin-right: 0; margin-left: 6px; }

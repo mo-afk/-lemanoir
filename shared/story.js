@@ -3,12 +3,13 @@
    --------------------------------------------------------------------------
    Génère une carte verticale 360x640 (exportée en 1080x1920 via html2canvas)
    avec la charte Le Manoir, puis :
-     • "Partager en Story"  -> Web Share API (fichier PNG) si disponible,
-                               sinon téléchargement automatique.
-     • "Télécharger la carte" -> téléchargement direct.
+     • Appareil mobile avec Web Share API (fichiers) : partage natif direct
+       (Instagram Stories / WhatsApp / etc.) via File.
+     • Repli gracieux (desktop ou sans partage de fichiers natif) : modale avec
+       bouton "TÉLÉCHARGER LA CARTE" pour sauvegarder le PNG.
    API : window.LM_STORY.show(cfg) / .close() / .share() / .download()
    cfg : objet ou fonction (re-traduite au changement de langue).
-   i18n : les libellés de l'UI de la carte suivent window.LM_I18N.
+   i18n : les libellés de l'UI de la carte suivent window.LM_I18N (FR / EN).
    ========================================================================== */
 (function () {
     'use strict';
@@ -17,6 +18,7 @@
 
     var overlay, scaleWrap, fitBox, card, els, closeBtn, shareBtn, dlBtn;
     var currentCfg = null, currentStoryDir = 'ltr', busy = false;
+    var activeTrigger = null, originalTriggerHtml = '';
 
     function I() { return window.LM_I18N; }
     function t(key, params) { return I() ? I().t(key, params) : key; }
@@ -26,6 +28,28 @@
         if (className) n.className = className;
         if (html != null) n.innerHTML = html;
         return n;
+    }
+
+    /* Détection mobile & Web Share API supportant les fichiers */
+    function isMobileDevice() {
+        var ua = navigator.userAgent || '';
+        var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        var isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+        return isMobileUA || (isTouch && window.innerWidth <= 1024);
+    }
+
+    function canShareFiles() {
+        if (!navigator.share || !navigator.canShare) return false;
+        try {
+            var testFile = new File(['x'], 'test.png', { type: 'image/png' });
+            return navigator.canShare({ files: [testFile] });
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function supportsNativeFileShare() {
+        return isMobileDevice() && canShareFiles();
     }
 
     function ensureDOM() {
@@ -43,6 +67,7 @@
         scaleWrap = el('div', 'lm-story-scale');
 
         card = el('div', 'lm-story-card');
+        card.setAttribute('dir', 'ltr');
         card.appendChild(el('div', 'lm-sc-bar'));
 
         var top = el('div', 'lm-sc-top');
@@ -74,9 +99,11 @@
         shareBtn = el('button', 'lm-story-btn', '<i class="fas fa-camera"></i><span></span>');
         shareBtn.id = 'lm-story-share';
         shareBtn.addEventListener('click', share);
-        dlBtn = el('button', 'lm-story-btn ghost', '<i class="fas fa-download"></i><span></span>');
+
+        dlBtn = el('button', 'lm-story-btn', '<i class="fas fa-download"></i><span></span>');
         dlBtn.id = 'lm-story-download';
         dlBtn.addEventListener('click', download);
+
         actions.appendChild(shareBtn);
         actions.appendChild(dlBtn);
 
@@ -89,7 +116,13 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && overlay.classList.contains('open')) close();
         });
-        window.addEventListener('resize', fit);
+        var resizeRaf = null;
+        function onResize() {
+            if (!overlay || !overlay.classList.contains('open')) return;
+            if (resizeRaf) cancelAnimationFrame(resizeRaf);
+            resizeRaf = requestAnimationFrame(fit);
+        }
+        window.addEventListener('resize', onResize, { passive: true });
 
         /* Synchronisation avec le changement de langue */
         document.addEventListener('languagechange', function () {
@@ -118,23 +151,41 @@
         fitBox.style.height = (CARD_H * s) + 'px';
     }
 
-    function setBusy(b, label) {
+    function setTriggerBusy(b) {
         busy = b;
-        var btns = overlay.querySelectorAll('.lm-story-btn');
-        Array.prototype.forEach.call(btns, function (b) {
-            b.disabled = b;
-        });
-        if (main() && label) {
-            main().innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + label + '</span>';
+        if (b) {
+            var active = document.activeElement;
+            if (active && (active.id === 'act-share' || active.id === 'wp-share' || active.id === 'qz-share' ||
+                active.classList.contains('result-btn') || active.classList.contains('spin-btn'))) {
+                activeTrigger = active;
+                originalTriggerHtml = active.innerHTML;
+                active.disabled = true;
+                active.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + t('story.generating') + '</span>';
+            }
+        } else {
+            if (activeTrigger) {
+                activeTrigger.disabled = false;
+                activeTrigger.innerHTML = originalTriggerHtml;
+                activeTrigger = null;
+            }
         }
-        if (!b) restoreButtons();
     }
 
-    function main() { return document.getElementById('lm-story-share'); }
-
-    function restoreButtons() {
-        var m = main();
-        if (m) m.innerHTML = '<i class="fas fa-camera"></i><span>' + t('story.share') + '</span>';
+    function setBusy(b, label) {
+        busy = b;
+        if (overlay) {
+            var btns = overlay.querySelectorAll('.lm-story-btn');
+            Array.prototype.forEach.call(btns, function (btnEl) {
+                btnEl.disabled = b;
+            });
+            if (dlBtn && b && label) {
+                dlBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + label + '</span>';
+            }
+            if (!b && dlBtn) {
+                dlBtn.innerHTML = '<i class="fas fa-download"></i><span>' + t('story.download') + '</span>';
+            }
+        }
+        if (!b) setTriggerBusy(false);
     }
 
     /* Remplit la carte avec la config du jeu (objet ou fonction) */
@@ -159,17 +210,39 @@
         });
         els.foot.innerHTML = (cfg.foot || t('story.default-foot')) +
             '<br><span class="lm-sc-ig">@cafelemanoir · Oujda</span>';
-        currentStoryDir = (I() && I().isRTL()) ? 'rtl' : 'ltr';
-        card.setAttribute('dir', currentStoryDir);
+        currentStoryDir = 'ltr';
+        card.setAttribute('dir', 'ltr');
+    }
+
+    function openModal() {
+        ensureDOM();
+        render();
+        setBusy(false);
+        refreshStaticTexts();
+
+        /* Dans la modale de repli, le bouton Télécharger est l'action principale */
+        if (shareBtn) shareBtn.style.display = 'none';
+        if (dlBtn) {
+            dlBtn.style.display = 'inline-flex';
+            dlBtn.className = 'lm-story-btn';
+            dlBtn.innerHTML = '<i class="fas fa-download"></i><span>' + t('story.download') + '</span>';
+        }
+
+        overlay.classList.add('open');
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fit);
+        else fit();
     }
 
     function show(cfg) {
         ensureDOM();
         currentCfg = cfg || {};
         render();
-        setBusy(false);
-        overlay.classList.add('open');
-        requestAnimationFrame(fit);
+
+        if (supportsNativeFileShare()) {
+            shareNative();
+        } else {
+            openModal();
+        }
     }
 
     function close() {
@@ -183,7 +256,7 @@
                 return reject(new Error('html2canvas indisponible'));
             }
             var clone = card.cloneNode(true);
-            clone.setAttribute('dir', currentStoryDir);
+            clone.setAttribute('dir', 'ltr');
             var holder = document.createElement('div');
             holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + CARD_W + 'px;height:' + CARD_H + 'px;';
             holder.appendChild(clone);
@@ -233,31 +306,51 @@
         setBusy(true, t('story.generating'));
         renderBlob().then(function (blob) {
             setBusy(false);
-            downloadBlob(blob);
+            downloadBlob(blob, 'le-manoir-story.png');
         }).catch(function () {
             setBusy(false);
             window.alert(t('story.alert-error'));
         });
     }
 
-    function share() {
+    function shareNative() {
         if (busy) return;
-        setBusy(true, t('story.generating'));
+        setTriggerBusy(true);
         renderBlob().then(function (blob) {
-            setBusy(false);
-            var file = new File([blob], 'le-manoir-story.png', { type: 'image/png' });
+            setTriggerBusy(false);
+            var file;
+            try {
+                file = new File([blob], 'le-manoir-story.png', { type: 'image/png' });
+            } catch (e) {
+                openModal();
+                return;
+            }
             var cfg = resolveCfg();
             var text = (cfg.title ? cfg.title + ' — ' : '') + 'Le Manoir · ' + t('story.logo-sub');
-            if (navigator.canShare && navigator.share && navigator.canShare({ files: [file] })) {
-                navigator.share({ files: [file], title: 'Le Manoir', text: text }).catch(function () { /* annulé par l'utilisateur */ });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: 'Le Manoir',
+                    text: text
+                }).catch(function (err) {
+                    if (err && err.name === 'AbortError') return; /* Annulation utilisateur */
+                    openModal();
+                });
             } else {
-                downloadBlob(blob);
-                window.alert(t('story.alert-downloaded'));
+                openModal();
             }
         }).catch(function () {
-            setBusy(false);
-            window.alert(t('story.alert-error'));
+            setTriggerBusy(false);
+            openModal();
         });
+    }
+
+    function share() {
+        if (supportsNativeFileShare()) {
+            shareNative();
+        } else {
+            download();
+        }
     }
 
     window.LM_STORY = {

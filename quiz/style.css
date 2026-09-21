@@ -52,44 +52,6 @@ a, button {
     to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-.rm-header {
-    text-align: center;
-    margin-bottom: 1.4rem;
-}
-
-.rm-header h1 {
-    font-family: var(--font-display);
-    font-size: 2.1rem;
-    font-weight: 700;
-    margin: 0.5rem 0 0.5rem;
-}
-
-.rm-tagline {
-    color: var(--secondary-text);
-    font-size: 0.95rem;
-}
-
-.section-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    color: var(--accent);
-    font-size: 1.25rem;
-    margin-bottom: 0.4rem;
-}
-
-.section-divider {
-    width: 50px;
-    height: 3px;
-    background: var(--accent);
-    margin: 0 auto;
-    border-radius: 10px;
-}
-
 .rm-actions {
     display: flex;
     justify-content: center;
@@ -338,14 +300,11 @@ a, button {
    ========================================================================== */
 @media (max-width: 480px) {
     .quiz-main { padding: 1.4rem 0.9rem 1.6rem; }
-    .rm-header h1 { font-size: 1.8rem; }
     .qz-question-text { font-size: 1.25rem; }
     #qz-profile-name { font-size: 1.9rem; }
 }
 
 @media (max-width: 360px) {
-    .rm-header h1 { font-size: 1.55rem; }
-    .rm-tagline { font-size: 0.82rem; }
     .spin-btn { padding: 0.9rem 1.3rem; }
 }
 
@@ -355,10 +314,3 @@ a, button {
         transition: none;
     }
 }
-
-/* ==========================================================================
-   RTL (العربية) — test de personnalité
-   ========================================================================== */
-[dir="rtl"] .qz-option { text-align: right; }
-[dir="rtl"] .qz-option:hover { transform: translateX(-4px); }
-[dir="rtl"] .qz-rec { text-align: right; }

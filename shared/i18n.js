@@ -1,10 +1,9 @@
 /* ==========================================================================
-   LE MANOIR — I18N (Français / العربية / English)
+   LE MANOIR — I18N (Français / English)
    --------------------------------------------------------------------------
    • Dictionnaire partagé + moteur de traduction (window.LM_I18N)
    • Persistance : localStorage['lemanoir_lang'] (défaut : FR)
-   • RTL automatique (dir="rtl") pour l'arabe
-   • Bascule de langue auto-montrée à côté du toggle mode sombre
+   • Bascule de langue dynamique à côté du toggle mode sombre
    • Convention DOM : data-i18n (texte) · data-i18n-ph (placeholder)
      data-i18n-title (title + aria-label)
    • Événement "languagechange" pour les contenus dynamiques (jeux)
@@ -15,9 +14,8 @@
     var STORAGE_KEY = 'lemanoir_lang';
     var DEFAULT_LANG = 'fr';
 
-    var FLAGS = { fr: '🇫🇷', ar: '🇲🇦', en: '🇬🇧' };
-    var NAMES = { fr: 'Français', ar: 'العربية', en: 'English' };
-    var ORDER = ['fr', 'ar', 'en'];
+    var FLAGS = { fr: '🇫🇷', en: '🇬🇧' };
+    var ORDER = ['fr', 'en'];
 
     /* ------------------------------------------------------- Dictionnaire --- */
     var DICT = {
@@ -75,13 +73,14 @@
             'aria.back-to-top': 'Retour en haut',
             'aria.close': 'Fermer',
             'fab.label': 'Combo Idéal',
+            'fab.tooltip': 'Joue & découvre ton combo !',
             'hub.back': 'Retour au Menu',
             'hub.combo': 'Combo Idéal',
             'hub.combo.short': 'Combo',
             'hub.who': 'Qui Paye ?',
             'hub.who.short': 'Qui Paye',
             'hub.quiz': 'Test de Personnalité',
-            'hub.quiz.short': 'Test',
+            'hub.quiz.short': 'Quiz',
             'combo.title': 'Combo Idéal',
             'combo.tagline': 'Un plat + une boisson qui va avec, choisis pour toi.',
             'combo.period.breakfast.name': 'Petit Déj',
@@ -254,6 +253,7 @@
             'aria.back-to-top': 'Back to top',
             'aria.close': 'Close',
             'fab.label': 'Ideal Combo',
+            'fab.tooltip': 'Play & find your combo !',
             'hub.back': 'Back to Menu',
             'hub.combo': 'Ideal Combo',
             'hub.combo.short': 'Combo',
@@ -377,185 +377,6 @@
             'story.alert-error': 'Could not generate the card. Check your connection and try again.',
             'story.alert-downloaded': 'Card downloaded!\nShare it from your gallery as an Instagram / WhatsApp story. 📸',
             'aria.lang': 'Change language'
-        },
-
-        ar: {
-            'hero.subtitle': 'المنيو الرقمي',
-            'meta.title': 'Le Manoir - المنيو الرقمي',
-            'meta.title.combo': 'الكومبو المثالي - Le Manoir',
-            'meta.title.who': 'من يدفع؟ - Le Manoir',
-            'meta.title.quiz': 'اختبار الشخصية - Le Manoir',
-            'nav.petit-dejeuner': 'الإفطار',
-            'nav.brunch': 'البرانش',
-            'nav.sandwichs': 'الساندويتشات',
-            'nav.specialites': 'المتطلبات الخاصة',
-            'nav.crepes': 'الكريب',
-            'nav.desserts': 'الحلويات',
-            'nav.desserts-maison': 'حلويات البيت',
-            'nav.glaces': 'الجليد والتارتوفو',
-            'nav.boissons-chaudes': 'المشروبات الساخنة',
-            'nav.boissons-froides': 'المشروبات الباردة',
-            'nav.ice-coffee': 'آيس كوفي',
-            'nav.milkshakes': 'الميلك شيك',
-            'nav.mocktails': 'الموكيتيلز',
-            'sec.petit-dejeuner': 'الإفطار',
-            'sec.brunch': 'البرانش',
-            'sec.sandwichs': 'الساندويتشات والإضافات',
-            'sec.specialites': 'المتطلبات الخاصة وتوست الفانيليا',
-            'sec.crepes': 'الكريب',
-            'sec.desserts': 'الحلويات: الشو، الوافل وبين كيك',
-            'sec.desserts-maison': 'حلويات البيت',
-            'sec.glaces': 'الجليد والتارتوفو',
-            'sec.boissons-chaudes': 'المشروبات الساخنة',
-            'sec.boissons-froides': 'المشروبات الباردة',
-            'sec.ice-coffee': 'آيس كوفي وفرنش فيبو',
-            'sec.milkshakes': 'الميلك شيك والسموذي',
-            'sec.mocktails': 'الموكيتيلز والموخيتو',
-            'sub.suggestions': 'اقتراحاتنا',
-            'sub.full-menu': 'القائمة الكاملة',
-            'badge.populaire': 'الأكثر طلبًا',
-            'badge.bestseller': 'الأفضل مبيعًا',
-            'badge.nouveau': 'جديد',
-            'badge.signature': 'المميّز',
-            'footer.tagline': 'تجربة غذائية فريدة',
-            'footer.games': 'ألعابنا',
-            'footer.hours': '٧ أيام في الأسبوع — من 7ص إلى 12م',
-            'footer.view-full-menu': 'شاهد القائمة الكاملة لـ',
-            'footer.location': 'الموقع',
-            'aria.fab': 'افتح الكومبو المثالي',
-            'aria.hub.nav': 'تنقّل الألعاب',
-            'aria.hub.back': 'العودة إلى القائمة الرئيسية',
-            'combo.aria.periods': 'اختر الوجبة',
-            'combo.aria.hub': 'اقترح كومبو',
-            'who.aria.hub': 'دوّر العجلة',
-            'who.aria.input': 'اسم اللاعب',
-            'aria.dark': 'تبديل الوضع الليلي',
-            'aria.back-to-top': 'العودة إلى الأعلى',
-            'aria.close': 'إغلاق',
-            'fab.label': 'الكومبو المثالي',
-            'hub.back': 'العودة إلى القائمة',
-            'hub.combo': 'الكومبو المثالي',
-            'hub.combo.short': 'كومبو',
-            'hub.who': 'من يدفع؟',
-            'hub.who.short': 'من يدفع',
-            'hub.quiz': 'اختبار الشخصية',
-            'hub.quiz.short': 'اختبار',
-            'combo.title': 'الكومبو المثالي',
-            'combo.tagline': 'طبق + مشروب يناسبه، اخترناهما لك.',
-            'combo.period.breakfast.name': 'الإفطار',
-            'combo.period.breakfast.time': '7ص — 11ص',
-            'combo.period.lunch.name': 'الغداء',
-            'combo.period.lunch.time': '12م — 4م',
-            'combo.period.dinner.name': 'العشاء',
-            'combo.period.dinner.time': '7م — 12م',
-            'combo.hub.label': 'دور',
-            'combo.hub.sub': 'كومبو',
-            'combo.spin': 'دور / اقترح',
-            'combo.hint': 'الأطباق المتاحة: {n} · {label}',
-            'combo.reel': 'اختر وجبتك ثم دوّر العجلة',
-            'combo.kicker': 'تشكيلتك المثالية',
-            'combo.kicker.period': 'تشكيلتك المثالية · {label}',
-            'combo.total': 'المجموع',
-            'combo.respin': 'إعادة الدوران',
-            'combo.locate': 'عرض في القائمة',
-            'combo.story.dish': 'الطبق',
-            'combo.story.drink': 'المشروب',
-            'combo.story.foot': 'الوصفة المثالية، اختارتها العجلة',
-            'who.title': 'من يدفع؟',
-            'who.tagline': 'أضف من 2 إلى 8 لاعبين. العجلة هي التي تقرر، بلا استئناف.',
-            'who.input-ph': 'اسم اللاعب',
-            'who.add': 'إضافة اللاعب',
-            'who.count': '{n} / 8 لاعبين',
-            'who.empty': 'سيظهر اللاعبون هنا…',
-            'who.clear': 'مسح الكل',
-            'who.start': 'دوّر العجلة',
-            'who.hint.need2': 'أضف لاعبين على الأقل',
-            'who.hint.need': 'أضف {n} لاعبين آخرين (الحد الأدنى 2)',
-            'who.hint.need1': 'أضف لاعبًا واحدًا آخر (الحد الأدنى 2)',
-            'who.hint.ready': 'جاهز! العجلة ستحسم الأمر',
-            'who.hint.max': 'الحد الأقصى 8 لاعبين!',
-            'who.hint.dup': 'هذا اللاعب موجود في العجلة بالفعل',
-            'who.remove': 'إزالة {name}',
-            'who.wheel.title': 'عجلة الحساب',
-            'who.wheel.hint': '{n} لاعبين في العجلة',
-            'who.wheel.go': 'يلا',
-            'who.wheel.gosub': 'ادفع!',
-            'who.spin': 'دور',
-            'who.change': 'تغيير اللاعبين',
-            'who.result.pays': 'يدفع!',
-            'who.joke0': 'العجلة لا تكذب، والحساب قادم!',
-            'who.joke1': 'ما كملتش تطلب… وصل الحساب!',
-            'who.joke2': 'الحلوى علينا، طبعًا.',
-            'who.joke3': 'كان مكتوبًا في النجوم… وعلى العجلة.',
-            'who.joke4': 'وشّ المحفظة: لهذا لها حزام.',
-            'who.joke5': 'رُميت النرد، وغادر الحساب.',
-            'who.joke6': 'لا أحد معفّى، حتى أنت.',
-            'who.joke7': 'المانوار يستدعيك. والحساب أيضًا.',
-            'who.result.respin': 'العب مجددًا',
-            'who.story.kicker': 'من يدفع اليوم؟',
-            'who.story.row': 'الطباخ حسم الأمر…',
-            'who.story.foot': 'في المانوار، الحساب يطير',
-            'quiz.title': 'اختبار الشخصية',
-            'quiz.tagline': '5 أسئلة. شخصيتك في المانوار… والأطباق التي تناسبها.',
-            'quiz.start': 'ابدأ الاختبار',
-            'quiz.progress': 'السؤال {i} من {total}',
-            'quiz.rec.title': 'مختاراتك من المانوار',
-            'quiz.restart': 'إعادة الاختبار',
-            'quiz.story.kicker': 'اختبار الشخصية',
-            'quiz.story.foot': 'مختاراتي من المانوار',
-            'q1.text': 'صباح سبتك المثالي يبدأ بـ…',
-            'q1.o0': 'برانش سخي وكاكاو كثيف',
-            'q1.o1': 'كابتشينو، كالمعتاد',
-            'q1.o2': 'سموذي طازج وفواكه',
-            'q1.o3': 'توست فانيلا بالكراميل، بطبيعة الحال',
-            'q2.text': 'دعوك المانوار على وجبة، ماذا تطلب؟',
-            'q2.o0': 'المنستر، دون تردد لحظة',
-            'q2.o1': 'ساندويتش مميز وعصير طازج',
-            'q2.o2': 'جرين ديتوكس، فالخفة مطلوبة',
-            'q2.o3': 'وافل بيستاتشيو أولًا، ثم نرى',
-            'q3.text': 'مشروبك المميز؟',
-            'q3.o0': 'ميلك شيك بالشوكولاتة المزدوجة',
-            'q3.o1': 'قهوة المانوار، عابرة الزمن',
-            'q3.o2': 'شاي بالنعناع، مريح',
-            'q3.o3': 'أفوغاتو، قهوة وآيس كريم دفعة واحدة',
-            'q4.text': 'الحلوى تأتي مع الطبق؟',
-            'q4.o0': 'حصتان: واحدة الآن وواحدة لاحقًا',
-            'q4.o1': 'الحلوى تنتظر دورها بآداب',
-            'q4.o2': 'فاكهة، وأنشغل بالأمور الجادة',
-            'q4.o3': 'الحلوى هي الطبق الرئيسي',
-            'q5.text': 'أسلوبك في تناول الطعام في المانوار؟',
-            'q5.o0': 'أذوق كل شيء، حتى طبق الجار',
-            'q5.o1': 'أوفي لوصفتي المفضلة',
-            'q5.o2': 'خفيف، سريع، دائمًا صحي',
-            'q5.o3': 'أطالع قائمة الحلويات أولًا',
-            'profile.gourmet.name': 'الغوريه',
-            'profile.gourmet.tag': 'جوع كبير، حصص كبيرة. المانوار هو بلاطك.',
-            'profile.classic.name': 'الكلاسيكي',
-            'profile.classic.tag': 'القيم الآمنة، مختارة بإتقان.',
-            'profile.light.name': 'الأنيق الخفيف',
-            'profile.light.tag': 'نعومة وخفة، وبدون أي ندم.',
-            'profile.dessert.name': 'صياد الحلويات',
-            'profile.dessert.tag': 'السكّر لا يهرم… وأنت بلا حدود.',
-            'rec.gourmet.sandwich': 'برغر التوقيع',
-            'rec.gourmet.main': 'طبقك السخي',
-            'rec.gourmet.shake': 'ميلك شيكك',
-            'rec.classic.sandwich': 'ساندويتش التوقيع',
-            'rec.classic.juice': 'عصيرك الطازج',
-            'rec.classic.coffee': 'قهوتك',
-            'rec.light.drink': 'مشروبك المنعش',
-            'rec.light.breakfast': 'إفطارك الخفيف',
-            'rec.light.tea': 'شائك',
-            'rec.dessert.waffle': 'وافلك',
-            'rec.dessert.crepe': 'كريبك',
-            'rec.dessert.pasty': 'حلوياتك',
-            'story.logo-sub': 'المنيو الرقمي',
-            'story.share': 'شارك في الستوري',
-            'story.download': 'حمّل البطاقة',
-            'story.generating': 'جارٍ الإنشاء…',
-            'story.default-foot': 'تجربة غذائية فريدة',
-            'story.alert-error': 'تعذر إنشاء البطاقة. تحقق من اتصالك وحاول مجددًا.',
-            'story.alert-downloaded': 'تم تنزيل البطاقة!\nشاركها من معرضك كستوري على إنستغرام / واتساب. 📸',
-            'aria.lang': 'تغيير اللغة'
         }
     };
 
@@ -576,7 +397,6 @@
     }
 
     function getLang() { return currentLang; }
-    function isRTL() { return currentLang === 'ar'; }
 
     function stored() {
         try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
@@ -588,6 +408,7 @@
     /* Remplace le texte d'un élément en préservant ses enfants (icônes…) */
     function setText(el, str) {
         if (!el) return;
+        if (!el.childNodes) { el.textContent = str; return; }
         var hasElementChild = false;
         for (var i = 0; i < el.childNodes.length; i++) {
             if (el.childNodes[i].nodeType === 1) { hasElementChild = true; break; }
@@ -609,12 +430,13 @@
         }
     }
 
-    function applyDom() {
-        var nodes = document.querySelectorAll('[data-i18n]');
+    function translatePage(root) {
+        var base = root || document;
+        var nodes = base.querySelectorAll('[data-i18n]');
         for (var i = 0; i < nodes.length; i++) setText(nodes[i], t(nodes[i].getAttribute('data-i18n')));
-        var phs = document.querySelectorAll('[data-i18n-ph]');
+        var phs = base.querySelectorAll('[data-i18n-ph]');
         for (var j = 0; j < phs.length; j++) phs[j].setAttribute('placeholder', t(phs[j].getAttribute('data-i18n-ph')));
-        var titles = document.querySelectorAll('[data-i18n-title]');
+        var titles = base.querySelectorAll('[data-i18n-title]');
         for (var k = 0; k < titles.length; k++) {
             var key = titles[k].getAttribute('data-i18n-title');
             titles[k].setAttribute('title', t(key));
@@ -622,22 +444,24 @@
         }
     }
 
+    var applyDom = translatePage;
+
     function setLang(code, opts) {
         opts = opts || {};
         if (!DICT[code]) code = DEFAULT_LANG;
-        var changed = code !== currentLang;
         currentLang = code;
         if (opts.persist !== false) persist(code);
         document.documentElement.setAttribute('lang', code);
-        document.documentElement.setAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
-        applyDom();
+        document.documentElement.setAttribute('dir', 'ltr');
+        translatePage();
         if (switcher) updateSwitcher();
-        document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: code } }));
+        if (typeof CustomEvent === 'function') {
+            document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: code } }));
+        }
     }
 
     /* ------------------------------------------------------- Bascule UI --- */
     var switcher = null;
-    var menu = null;
     var btn = null;
     var currentFlag = null;
     var currentCode = null;
@@ -647,29 +471,23 @@
         var st = document.createElement('style');
         st.id = 'lm-i18n-css';
         st.textContent =
-            '.lang-switch{position:relative;display:inline-flex;flex-shrink:0;}' +
-            '.lang-btn{display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 10px;' +
+            '.lang-switch{position:relative;display:inline-flex;align-items:center;flex-shrink:0;}' +
+            '.lang-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:40px;padding:0 10px;' +
             'border:2px solid var(--border-color,#EAEAEA);border-radius:50px;background:var(--surface,#fff);' +
             'color:var(--primary-text,#1A1A1A);font-family:var(--font-body,"Lato"),sans-serif;font-weight:700;' +
-            'font-size:0.78rem;letter-spacing:0.5px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);}' +
-            '.lang-btn:hover{border-color:var(--accent,#C8956C);color:var(--accent,#C8956C);}' +
-            '.lang-btn .lang-chev{font-size:0.55rem;opacity:0.6;transition:transform 0.25s;}' +
-            '.lang-switch.open .lang-btn .lang-chev{transform:rotate(180deg);}' +
-            '.lang-menu{position:fixed;z-index:100001;min-width:170px;margin:6px 0 0;padding:6px;' +
-            'border-radius:16px;border:1px solid var(--border-color,#EAEAEA);background:var(--surface,#fff);' +
-            'box-shadow:0 18px 50px rgba(0,0,0,0.22);display:none;}' +
-            '.lang-switch.open .lang-menu{display:block;animation:lmLangIn 0.18s ease-out;}' +
-            '@keyframes lmLangIn{from{opacity:0;transform:translateY(-6px) scale(0.97);}to{opacity:1;transform:none;}}' +
-            '.lang-item{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 14px;' +
-            'border:none;border-radius:12px;background:transparent;color:var(--primary-text,#1A1A1A);' +
-            'font-family:var(--font-body,"Lato"),sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;' +
-            'text-align:start;transition:background 0.2s;}' +
-            '.lang-item:hover{background:var(--accent-light,rgba(200,149,108,0.1));}' +
-            '.lang-item[aria-checked="true"]{background:var(--accent,#C8956C);color:#fff;}' +
-            '.lang-item .lang-flag{font-size:1.1rem;line-height:1;}' +
-            '.lang-item .lang-check{margin-inline-start:auto;font-size:0.7rem;color:var(--accent,#C8956C);}' +
-            '.lang-item[aria-checked="true"] .lang-check{color:#fff;}';
+            'font-size:0.78rem;letter-spacing:0.5px;cursor:pointer;box-shadow:var(--shadow,0 2px 8px rgba(0,0,0,0.05));' +
+            'transition:all 0.25s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;user-select:none;-webkit-user-select:none;}' +
+            '.lang-btn:hover{border-color:var(--accent,#C8956C);color:var(--accent,#C8956C);transform:translateY(-1px);}' +
+            '.lang-btn:active{transform:scale(0.96);}' +
+            '.lang-btn .lang-flag{font-size:0.95rem;line-height:1;}' +
+            '.lang-btn .lang-code{font-size:0.75rem;font-weight:700;letter-spacing:0.5px;}' +
+            'body.dark-mode .lang-btn{border-color:var(--border-color,#332F2A);background:var(--surface,#24201C);color:var(--primary-text,#F5F5F0);}' +
+            'body.dark-mode .lang-btn:hover{border-color:var(--accent,#C8956C);color:var(--accent,#C8956C);}';
         document.head.appendChild(st);
+    }
+
+    function toggleLang() {
+        setLang(currentLang === 'fr' ? 'en' : 'fr');
     }
 
     function buildSwitcher() {
@@ -684,84 +502,29 @@
         btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'lang-btn';
-        btn.setAttribute('aria-haspopup', 'true');
-        btn.setAttribute('aria-expanded', 'false');
         btn.setAttribute('data-i18n-title', 'aria.lang');
-        btn.innerHTML = '<span class="lang-flag"></span><span class="lang-code"></span><i class="fas fa-chevron-down lang-chev" aria-hidden="true"></i>';
+        btn.innerHTML = '<span class="lang-flag"></span><span class="lang-code"></span>';
         btn.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            toggleMenu();
-        });
-
-        menu = document.createElement('div');
-        menu.className = 'lang-menu';
-        menu.setAttribute('role', 'menu');
-        ORDER.forEach(function (code) {
-            var item = document.createElement('button');
-            item.type = 'button';
-            item.className = 'lang-item';
-            item.setAttribute('role', 'menuitemradio');
-            item.setAttribute('data-lang', code);
-            item.innerHTML = '<span class="lang-flag">' + FLAGS[code] + '</span><span>' + NAMES[code] + '</span><i class="fas fa-check lang-check" aria-hidden="true"></i>';
-            item.addEventListener('click', function () {
-                setLang(code);
-                closeMenu();
-            });
-            menu.appendChild(item);
+            toggleLang();
         });
 
         switcher.appendChild(btn);
-        switcher.appendChild(menu);
         anchor.parentNode.insertBefore(switcher, anchor);
 
-        document.addEventListener('click', function (e) {
-            if (switcher && !switcher.contains(e.target)) closeMenu();
-        });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeMenu();
-        });
-        window.addEventListener('resize', closeMenu);
-
         updateSwitcher();
-    }
-
-    function toggleMenu() {
-        var open = switcher.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        if (open) positionMenu();
-    }
-
-    function closeMenu() {
-        if (!switcher) return;
-        switcher.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-    }
-
-    function positionMenu() {
-        var r = btn.getBoundingClientRect();
-        var mw = menu.offsetWidth || 170;
-        var x;
-        if (document.documentElement.getAttribute('dir') === 'rtl') {
-            x = Math.max(8, r.right - mw);
-        } else {
-            x = Math.min(window.innerWidth - mw - 8, r.left);
-        }
-        var y = r.bottom + 6;
-        if (y + menu.offsetHeight > window.innerHeight - 8) y = Math.max(8, r.top - menu.offsetHeight - 6);
-        menu.style.left = x + 'px';
-        menu.style.top = y + 'px';
     }
 
     function updateSwitcher() {
         if (!btn) return;
         currentFlag = btn.querySelector('.lang-flag');
         currentCode = btn.querySelector('.lang-code');
-        currentFlag.textContent = FLAGS[currentLang];
-        currentCode.textContent = currentLang.toUpperCase();
-        var items = menu.querySelectorAll('.lang-item');
-        for (var i = 0; i < items.length; i++) {
-            items[i].setAttribute('aria-checked', items[i].getAttribute('data-lang') === currentLang ? 'true' : 'false');
-        }
+        if (currentFlag) currentFlag.textContent = FLAGS[currentLang] || '';
+        if (currentCode) currentCode.textContent = (currentLang || '').toUpperCase();
+        var label = currentLang === 'fr' ? 'Passer en anglais (Switch to English)' : 'Passer en français (Switch to French)';
+        btn.setAttribute('title', label);
+        btn.setAttribute('aria-label', label);
     }
 
     /* ------------------------------------------------------------ Init --- */
@@ -769,16 +532,18 @@
         var saved = stored();
         /* défaut : FR (aucune autodétection navigateur) ; la préférence est
            toujours persistée pour être lue sur les sous-pages / au rechargement */
-        setLang(saved && DICT[saved] ? saved : DEFAULT_LANG);
+        setLang(saved && (saved === 'fr' || saved === 'en') ? saved : DEFAULT_LANG);
         buildSwitcher();
+        translatePage();
     }
 
     window.LM_I18N = {
         t: t,
         getLang: getLang,
         setLang: setLang,
-        isRTL: isRTL,
-        applyDom: applyDom,
+        toggleLang: toggleLang,
+        applyDom: translatePage,
+        translatePage: translatePage,
         languages: ORDER.slice()
     };
 

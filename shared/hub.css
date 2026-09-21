@@ -56,10 +56,11 @@ body.dark-mode {
 }
 
 .hub-nav-inner {
-    max-width: 760px;
+    max-width: 820px;
     margin: 0 auto;
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     padding: 0.55rem 0.75rem;
     padding-top: calc(0.55rem + env(safe-area-inset-top, 0px));
@@ -68,10 +69,11 @@ body.dark-mode {
 .hub-back {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     flex-shrink: 0;
-    min-height: 44px;
-    padding: 0.55rem 1.1rem 0.55rem 0.85rem;
+    min-height: 42px;
+    padding: 0.5rem 1rem 0.5rem 0.85rem;
     border-radius: 50px;
     border: 2px solid var(--border-color);
     background: var(--surface);
@@ -83,25 +85,23 @@ body.dark-mode {
     text-decoration: none;
     box-shadow: var(--shadow);
     transition: all var(--transition);
+    white-space: nowrap;
 }
 
 .hub-back i { color: var(--accent); font-size: 0.95rem; transition: transform var(--transition); }
 .hub-back:hover { border-color: var(--accent); background: var(--accent-light); transform: translateX(-2px); }
-.hub-back:hover i { transform: translateX(-3px); }
-.hub-back:active { transform: scale(0.97); }
+.hub-back:hover i.hub-back-arrow { transform: translateX(-3px); }
+.hub-back:hover i.hub-back-home { transform: scale(1.1); }
+.hub-back:active { transform: scale(0.96); }
 
 .hub-links {
     display: flex;
     align-items: center;
     gap: 0.4rem;
     margin-left: auto;
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
-
-.hub-links::-webkit-scrollbar { display: none; }
 
 .hub-link {
     display: inline-flex;
@@ -132,7 +132,7 @@ body.dark-mode {
 
 .hub-dark-toggle {
     flex-shrink: 0;
-    background: none;
+    background: var(--surface);
     border: 2px solid var(--border-color);
     color: var(--primary-text);
     width: 40px;
@@ -148,18 +148,61 @@ body.dark-mode {
 .hub-dark-toggle:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
 body.dark-mode .hub-dark-toggle i::before { content: "\f185"; }
 
-@media (max-width: 480px) {
-    .hub-nav-inner { gap: 0.4rem; padding-left: 0.55rem; padding-right: 0.55rem; }
-    .hub-back { padding: 0.55rem 0.85rem; }
-    .hub-back .hl-full { display: none; }
-    .hub-back { padding-left: 1.05rem; padding-right: 1.05rem; }
-    .hub-link { padding: 0.4rem 0.7rem; font-size: 0.75rem; }
+@media (max-width: 639px) {
+    .hub-nav-inner {
+        gap: 0.35rem;
+        padding: 0.45rem 0.55rem;
+        padding-top: calc(0.45rem + env(safe-area-inset-top, 0px));
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .hub-nav-inner::-webkit-scrollbar { display: none; }
+
+    .hub-back {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        max-width: 38px;
+        max-height: 38px;
+        padding: 0;
+        border-radius: 50%;
+        gap: 0;
+    }
+    .hub-back .hub-back-text { display: none; }
+    .hub-back .hub-back-arrow { display: none; }
+    .hub-back .hub-back-home { display: inline-block; font-size: 0.95rem; }
+
+    .hub-links {
+        margin-left: 0;
+        gap: 0.3rem;
+        overflow-x: visible;
+    }
+    .hub-link {
+        min-height: 38px;
+        padding: 0.38rem 0.65rem;
+        font-size: 0.78rem;
+    }
     .hub-link .hl-full { display: none; }
     .hub-link .hl-short { display: inline; }
+
+    .hub-dark-toggle {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+    }
 }
 
-@media (min-width: 481px) {
+@media (min-width: 640px) {
+    .hub-back .hub-back-home { display: none; }
+    .hub-back .hub-back-arrow { display: inline-block; }
+    .hub-back .hub-back-text { display: inline; }
     .hub-link .hl-short { display: none; }
+    .hub-link .hl-full { display: inline; }
 }
 
 /* ==========================================================================
@@ -459,24 +502,60 @@ body.dark-mode .hub-dark-toggle i::before { content: "\f185"; }
 .lm-story-btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.4); }
 .lm-story-btn.ghost:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* ==========================================================================
-   RTL (العربية) — hub des jeux + carte story 9:16
-   ========================================================================== */
-[dir="rtl"] body {
-    font-family: var(--font-body), Tahoma, 'Geeza Pro', 'Arabic Typesetting', sans-serif;
+/* ---------- En-tête partagé des mini-jeux ---------- */
+.rm-header {
+    text-align: center;
+    margin-bottom: 1.4rem;
+    animation: hubHeaderFadeIn 0.6s ease-out both;
 }
 
-/* La liaison des lettres arabes est cassée par letter-spacing : toujours 0 */
-[dir="rtl"] * { letter-spacing: 0 !important; }
+@keyframes hubHeaderFadeIn {
+    from { opacity: 0; transform: translate3d(0, -18px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
 
-/* Retour : flèche vers la droite + décalage miroir */
-[dir="rtl"] .hub-back { padding: 0.55rem 0.85rem 0.55rem 1.1rem; }
-[dir="rtl"] .hub-back i { transform: scaleX(-1); }
-[dir="rtl"] .hub-back:hover { transform: translateX(2px); }
-[dir="rtl"] .hub-back:hover i { transform: scaleX(-1) translateX(-3px); }
+.rm-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.5rem;
+}
 
-/* Carte story : bouton de fermeture en miroir */
-[dir="rtl"] .lm-story-close { right: auto; left: 12px; }
+.rm-tagline {
+    color: var(--secondary-text);
+    font-size: 0.95rem;
+}
 
-/* Pied de page : flèche en miroir */
-[dir="rtl"] .page-footer a i { transform: rotate(180deg); }
+.section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 1.25rem;
+    margin-bottom: 0.4rem;
+}
+
+.section-divider {
+    width: 50px;
+    height: 3px;
+    background: var(--accent);
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+    .rm-header h1 { font-size: 1.8rem; }
+}
+
+@media (max-width: 360px) {
+    .rm-header h1 { font-size: 1.55rem; }
+    .rm-tagline { font-size: 0.82rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-header { animation: none; }
+}

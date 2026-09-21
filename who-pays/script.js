@@ -390,6 +390,7 @@
                 $('wp-wheel-hint').textContent = t('who.wheel.hint', { n: players.length });
             }
             if (resultBox.classList.contains('open')) renderResult();
+            draw();
         });
 
         syncPlayers();

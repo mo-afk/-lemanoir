@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -15,16 +15,17 @@
 </head>
 <body data-game="who">
 
-    <nav class="hub-nav" aria-label="Navigation des jeux">
+    <nav class="hub-nav" aria-label="Navigation des jeux" data-i18n-title="aria.hub.nav">
         <div class="hub-nav-inner">
-            <a class="hub-back" href="../index.html" aria-label="Retour au menu principal">
-                <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                <span data-i18n="hub.back">Retour au Menu</span>
+            <a class="hub-back" href="../index.html" aria-label="Retour au menu principal" data-i18n-title="aria.hub.back">
+                <i class="fas fa-home hub-back-home" aria-hidden="true"></i>
+                <i class="fas fa-arrow-left hub-back-arrow" aria-hidden="true"></i>
+                <span class="hub-back-text" data-i18n="hub.back">Retour au Menu</span>
             </a>
             <div class="hub-links">
                 <a class="hub-link" href="../combo-ideal/" data-game="combo"><span class="hl-full"><span aria-hidden="true">🎰 </span><span data-i18n="hub.combo">Combo Idéal</span></span><span class="hl-short"><span aria-hidden="true">🎰 </span><span data-i18n="hub.combo.short">Combo</span></span></a>
                 <a class="hub-link" href="../who-pays/" data-game="who"><span class="hl-full"><span aria-hidden="true">👥 </span><span data-i18n="hub.who">Qui Paye ?</span></span><span class="hl-short"><span aria-hidden="true">👥 </span><span data-i18n="hub.who.short">Qui Paye</span></span></a>
-                <a class="hub-link" href="../quiz/" data-game="quiz"><span class="hl-full"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz">Test de Personnalité</span></span><span class="hl-short"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz.short">Test</span></span></a>
+                <a class="hub-link" href="../quiz/" data-game="quiz"><span class="hl-full"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz">Test de Personnalité</span></span><span class="hl-short"><span aria-hidden="true">🧠 </span><span data-i18n="hub.quiz.short">Quiz</span></span></a>
             </div>
             <button class="hub-dark-toggle" aria-label="Toggle dark mode" data-i18n-title="aria.dark"><i class="fas fa-moon"></i></button>
         </div>
