@@ -44,7 +44,10 @@ body {
     background-color: var(--background);
     color: var(--primary-text);
     line-height: 1.7;
-    overflow-x: hidden;
+    /* overflow-x: clip ne crée PAS de conteneur de scroll : position: sticky
+       de .category-nav continue de fonctionner (overflow-x: hidden le cassait).
+       Le clipping horizontal reste assuré par html { overflow-x: hidden; }. */
+    overflow-x: clip;
     transition: background-color var(--transition), color var(--transition);
     -webkit-tap-highlight-color: transparent;
 }
@@ -214,15 +217,34 @@ body {
 .category-nav {
     position: sticky;
     top: 0;
+    z-index: 99;
     background-color: var(--background);
-    z-index: 10;
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 10px rgba(0,0,0,0.04);
     transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
+/* Barre "collée" en haut du viewport : fond translucide + flou (glassmorphism)
+   pour rester lisible par-dessus le contenu qui défile en dessous. */
 .category-nav.scrolled {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background-color: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+}
+
+body.dark-mode .category-nav.scrolled {
+    background-color: rgba(18, 18, 18, 0.8);
+}
+
+/* Repli si backdrop-filter n'est pas supporté : fond plus opaque */
+@supports not ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .category-nav.scrolled {
+        background-color: rgba(255, 255, 255, 0.97);
+    }
+    body.dark-mode .category-nav.scrolled {
+        background-color: rgba(18, 18, 18, 0.97);
+    }
 }
 
 .nav-container {
@@ -293,6 +315,8 @@ main {
     padding: 2.5rem 0;
     border-bottom: 1px solid var(--border-color);
     transition: border-color var(--transition);
+    /* Évite que le titre de section ne se cache sous la barre sticky */
+    scroll-margin-top: 70px;
 }
 
 .menu-section:last-of-type { border-bottom: none; }
@@ -844,6 +868,8 @@ a, button {
 }
 
 /* ---------- FAB Container & Button ---------- */
+/* Caché par défaut : affiché uniquement une fois l'écran de chargement
+   terminé (body.fab-ready ajouté par script.js après le fade-out). */
 .fab-container {
     position: fixed;
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
@@ -852,7 +878,24 @@ a, button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(18px) scale(0.9);
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s, transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+
+body.fab-ready .fab-container {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.45s ease, visibility 0s, transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* La bulle de notification ne démarre son animation qu'après le loader */
+.fab-container .fab-tooltip { animation-play-state: paused; }
+body.fab-ready .fab-container .fab-tooltip { animation-play-state: running; }
 
 .roulette-fab {
     position: relative;
@@ -930,8 +973,9 @@ a, button {
 }
 
 .fab-container:hover .fab-tooltip,
-.fab-tooltip:hover {
-    animation-play-state: paused;
+.fab-tooltip:hover,
+.fab-tooltip:focus-visible {
+    animation: none;
     opacity: 1;
     visibility: visible;
     transform: scale(1) translateY(0);

@@ -65,6 +65,21 @@
         return prefer(cold,['jus orange','orange','soda']) || pick(cold) || pick(mock);
     }
 
+    /* --------------------------------------------------- FX partagés --- */
+    /* Sons (Web Audio) + vibrations via shared/fx.js, avec repli local. */
+    function fxTick() {
+        if (window.LM_FX) { window.LM_FX.tick(); return; }
+        if (navigator.vibrate && !reduced) navigator.vibrate(15);
+    }
+    function fxWin() {
+        if (window.LM_FX) { window.LM_FX.win(); return; }
+        if (navigator.vibrate && !reduced) navigator.vibrate([10, 30, 10]);
+    }
+    function fxBuzz(pattern) {
+        if (window.LM_FX) { window.LM_FX.buzz(pattern); return; }
+        if (navigator.vibrate && !reduced) navigator.vibrate(pattern);
+    }
+
     /* ---------------------------------------------------------------- DOM --- */
     var period='lunch';
     var canvas, ctx, frame, hub, wheelShell;
@@ -235,6 +250,9 @@
     /* ------------------------------------------------------------- Spin --- */
     function spinCombo(isRespin){
         if(spinning) return;
+        /* Débloque l'audio dans le geste utilisateur (iOS / Android) */
+        if(window.LM_FX) window.LM_FX.unlock();
+        fxBuzz(10);
         var list=candidatesFor(period);
         if(isRespin && lastDish) list=list.filter(function(i){return i.id!==lastDish.id;});
         if(list.length<2) list=candidatesFor(period);
@@ -269,7 +287,7 @@
             var idx=sliceIndexAtPointer();
             if(idx!==lastIdx){lastIdx=idx;
                 if(pointer){pointer.classList.remove('tick');void pointer.offsetWidth;pointer.classList.add('tick');}
-                if(navigator.vibrate&&!reduced)navigator.vibrate(6);}
+                fxTick();}
             if(p<1)requestAnimationFrame(step);
             else{rotation=target;draw();finish();}
         }
@@ -290,7 +308,7 @@
         stopReel(); spinning=false; spinBtn.disabled=false;
         reel.classList.add('hidden');
         showCombo(winner);
-        if(navigator.vibrate&&!reduced)navigator.vibrate([18,60,24]);
+        fxWin();
     }
 
     /* ----------------------------------------------------------- Combo --- */

@@ -152,13 +152,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ---------------------------------------------------------------
        Écran de chargement fluide sans délai artificiel
+       Le FAB (+ sa bulle) reste caché pendant le chargement et n'apparaît
+       qu'une fois le fade-out du loader terminé (body.fab-ready).
        --------------------------------------------------------------- */
+    function revealFab() {
+        document.body.classList.add('fab-ready');
+    }
+
     function dismissLoader() {
         if (loader && !loader.classList.contains('hidden')) {
             loader.classList.add('hidden');
             setTimeout(() => {
                 loader.style.display = 'none';
+                revealFab();
             }, 600);
+        } else {
+            /* Loader absent ou déjà masqué : pas d'attente supplémentaire */
+            revealFab();
         }
     }
 
@@ -168,6 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('load', dismissLoader, { once: true });
     }
     setTimeout(dismissLoader, 3000);
+
+    /* Retour depuis le cache navigateur (bfcache) : s'assurer que le FAB est visible */
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) dismissLoader();
+    });
 
     /* ---------------------------------------------------------------
        Animations AOS
@@ -374,19 +389,20 @@ document.addEventListener('DOMContentLoaded', () => {
        --------------------------------------------------------------- */
     const backToTop = document.querySelector('.back-to-top');
     const nav = document.querySelector('.category-nav');
-    let isScrolledPast100 = false;
+    let isNavStuck = false;
     let isScrolledPast500 = false;
     let scrollTicking = false;
 
     function handleScroll() {
         const y = window.scrollY || window.pageYOffset;
-        const over100 = y > 100;
         const over500 = y > 500;
 
-        if (over100 !== isScrolledPast100) {
-            isScrolledPast100 = over100;
-            if (nav) {
-                nav.classList.toggle('scrolled', over100);
+        /* La barre est "collée" dès qu'elle atteint le haut du viewport */
+        if (nav) {
+            const stuck = nav.getBoundingClientRect().top <= 0.5;
+            if (stuck !== isNavStuck) {
+                isNavStuck = stuck;
+                nav.classList.toggle('scrolled', stuck);
             }
         }
 
