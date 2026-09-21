@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -18,8 +18,8 @@
             background: #1a1a1a;
         }
         .lazy-video {
-            opacity: 0;
-            transition: opacity 0.5s;
+            opacity: 1;
+            transition: opacity 0.3s;
         }
         .lazy-video.loaded {
             opacity: 1;
@@ -38,9 +38,6 @@
     <header class="hero-section">
         <div class="hero-slider">
             <video src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video hero.webm" class="active" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/heroposter.jpg" autoplay muted loop playsinline></video>
-            <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/heroposter.jpg" muted loop playsinline preload="none">
-                <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video hero.webm" type="video/webm">
-            </video>
         </div>
         <div class="hero-overlay"></div>
         <div class="logo-overlay">
@@ -81,8 +78,8 @@
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up" data-description="La formule complète: 2 oeufs, fromage rouge, tapenade, huile d'olive, hasoua, jus, boisson chaude, verrine, eau.">
                     <div class="card-badge" data-i18n="badge.populaire">Populaire</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
                     </video>
                     <div class="card-content">
                         <h3>Formule classique</h3>
@@ -92,8 +89,8 @@
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100" data-description="Un voyage au Maroc avec harcha, msemen, meloui, baghrir, amlou, jben, miel, olives noires et plus.">
                     <div class="card-badge best" data-i18n="badge.bestseller">Best-seller</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content">
                         <h3>Formule saveur terroir</h3>
@@ -103,8 +100,8 @@
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200" data-description="Une touche d'élégance avec 2 oeufs, assortiment de charcuterie, tranches de fromage, jben, olives, hasoua et jus.">
                     <div class="card-badge new" data-i18n="badge.nouveau">Nouveau</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content">
                         <h3>Formule nordique</h3>
@@ -135,22 +132,22 @@
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up" data-description="Pain bagel, fromage blanc, champignons, avocat, charcuterie, oeuf au plat, pommes de terre nouvelles, merguez, petite salade, verrine, croissant sucré, boisson chaude, eau.">
                     <div class="card-badge best" data-i18n="badge.signature">Signature</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Brunch Le Manoir</h3><p class="ingredients">Le brunch ultime pour les gourmands.</p><span class="price">82 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100" data-description="2 tartines à la purée d'avocat et saumon fumé, 2 oeufs pochés, petite salade, boule de yaourt aux fruits frais et fruits secs, hasoua, boisson chaude, eau.">
                     <div class="card-badge" data-i18n="badge.populaire">Populaire</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (4).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (4).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (4).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Brunch norvégien</h3><p class="ingredients">Frais, sain et délicieux.</p><span class="price">75 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200" data-description="2 oeufs brouillés, 3 saucisses, pommes de terre nouvelles, petite salade, 2 tranches de jambon, 2 pancakes au chocolat, hasoua, boisson chaude, eau.">
                     <div class="card-badge new" data-i18n="badge.nouveau">Nouveau</div>
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Brunch English</h3><p class="ingredients">Un repas copieux pour les gourmands.</p><span class="price">70 Dh</span></div>
                 </div>
@@ -171,20 +168,20 @@
             <h4 class="subcategory-title" data-aos="fade-in" data-i18n="sub.suggestions"><i class="fas fa-star"></i> Nos Suggestions</h4>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Le Boss</h3><p class="ingredients">Le sandwich des vrais patrons.</p><span class="price">55 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Le Monstre</h3><p class="ingredients">Pour les très grosses faims.</p><span class="price">60 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Mozzarella sticks</h3><p class="ingredients">L'accompagnement parfait.</p><span class="price">30 Dh</span></div>
                 </div>
@@ -209,20 +206,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Le Box Maison</h3><span class="price">85 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Mighty Crêpe</h3><span class="price">65 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Brioche perdue + caramel</h3><span class="price">48 Dh</span></div>
                 </div>
@@ -246,20 +243,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Kuna Crêpe</h3><span class="price">70 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Oreo Fettuccine</h3><span class="price">65 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Marisco</h3><span class="price">55 Dh</span></div>
                 </div>
@@ -284,20 +281,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Pistache & Kunafa</h3><span class="price">70 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Gaufre Pistacchio</h3><span class="price">70 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Pancake Amlou</h3><span class="price">63 Dh</span></div>
                 </div>
@@ -324,20 +321,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>San Sebastián classique</h3><span class="price">40 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>San Sebastián pistache</h3><span class="price">55 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Assiette fruits italienne</h3><span class="price">200 Dh</span></div>
                 </div>
@@ -362,20 +359,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Coupe Le Manoir</h3><span class="price">70 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Tartufo Pistacchio</h3><span class="price">70 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Tartufo Bianco</h3><span class="price">65 Dh</span></div>
                 </div>
@@ -398,20 +395,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Café Le Manoir</h3><span class="price">32 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterdej.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj - Copie (3).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Pistachio</h3><span class="price">28 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Le Manoir Chocolat</h3><span class="price">38 Dh</span></div>
                 </div>
@@ -438,20 +435,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Avocat fruit sec</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Crunch Gold</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Green Détox</h3><span class="price">35 Dh</span></div>
                 </div>
@@ -477,20 +474,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Frappuccino Le Manoir</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (3).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/poster dej2.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (3).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video déj 2 - Copie (3).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Ice Matcha</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video plates - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Ice Spanish</h3><span class="price">26 Dh</span></div>
                 </div>
@@ -512,20 +509,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café - Copie (3).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/postercoffe.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café - Copie (3).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video café - Copie (3).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Bounty Shake</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie (2).webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Lotus Shake</h3><span class="price">38 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Paradise Maracuja</h3><span class="price">36 Dh</span></div>
                 </div>
@@ -547,20 +544,20 @@
             </div>
             <div class="popular-carousel">
                 <div class="popular-card" data-aos="fade-up">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterpizza.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/video pizza - Copie.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Mocktail Le Manoir</h3><span class="price">40 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="100">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Mojito Energy</h3><span class="price">40 Dh</span></div>
                 </div>
                 <div class="popular-card" data-aos="fade-up" data-aos-delay="200">
-                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="none">
-                        <source data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
+                    <video class="lazy-video" poster="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/posterplates.jpg" muted loop playsinline preload="metadata">
+                        <source src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" data-src="https://pub-5dafc5852b4748ea877521d8d93bb224.r2.dev/videoplates.webm" type="video/webm">
                     </video>
                     <div class="card-content"><h3>Pina Colada</h3><span class="price">35 Dh</span></div>
                 </div>
@@ -613,49 +610,15 @@
     <button class="back-to-top" aria-label="Retour en haut" data-i18n-title="aria.back-to-top">
         <i class="fas fa-arrow-up"></i>
     </button>
-    <a class="roulette-fab" href="combo-ideal/index.html" aria-label="Ouvrir le Combo Idéal" data-i18n-title="aria.fab">
-        <i class="fas fa-wand-magic-sparkles"></i>
-        <span class="fab-label" data-i18n="fab.label">Combo Idéal</span>
-    </a>
+    <div class="fab-container" id="fab-container">
+        <span class="fab-tooltip" id="fab-tooltip" data-i18n="fab.tooltip" role="button" tabindex="0" aria-label="Combo Idéal">Joue &amp; découvre ton combo !</span>
+        <a class="roulette-fab" href="combo-ideal/index.html" aria-label="Ouvrir le Combo Idéal" data-i18n-title="aria.fab">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <span class="fab-label" data-i18n="fab.label">Combo Idéal</span>
+        </a>
+    </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 800, once: true });
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const lazyVideos = document.querySelectorAll('video.lazy-video');
-
-            if ("IntersectionObserver" in window) {
-                const videoObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const video = entry.target;
-                            const source = video.querySelector('source');
-                            
-                            if (source && source.dataset.src) {
-                                source.src = source.dataset.src;
-                                video.load();
-                                video.classList.add('loaded');
-                                video.play().catch(e => console.log("Autoplay blocked"));
-                            }
-                            
-                            observer.unobserve(video);
-                        }
-                    });
-                }, {
-                    rootMargin: "0px 0px 300px 0px"
-                });
-
-                lazyVideos.forEach(v => videoObserver.observe(v));
-            } else {
-                lazyVideos.forEach(v => {
-                    const source = v.querySelector('source');
-                    if(source) source.src = source.dataset.src;
-                    v.load();
-                });
-            }
-        });
-    </script>
     <script src="shared/i18n.js?v=4"></script>
     <script src="shared/menu-data.js?v=4"></script>
     <script src="script.js?v=4"></script>
