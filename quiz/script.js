@@ -113,6 +113,32 @@
     /* ---------------------------------------------- Résolution des recos --- */
     function t(key, params) { return window.LM_I18N ? window.LM_I18N.t(key, params) : key; }
 
+    /* --------------------------------------------------- FX partagés --- */
+    /* Sons (Web Audio) + vibrations via shared/fx.js, avec repli local. */
+    var reducedMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function fxBuzz(pattern) {
+        if (window.LM_FX) { window.LM_FX.buzz(pattern); return; }
+        if (navigator.vibrate && !reducedMotion) navigator.vibrate(pattern);
+    }
+
+    function fxAnswer() {
+        /* Sélection d'une réponse : "tic" doux + vibration 15ms */
+        if (window.LM_FX) {
+            window.LM_FX.blip(1250, 60, 0.05, 'sine');
+            fxBuzz(15);
+            return;
+        }
+        fxBuzz(15);
+    }
+
+    function fxResult() {
+        /* Révélation du profil : deux notes + vibration [10, 30, 10] */
+        if (window.LM_FX) { window.LM_FX.win(); return; }
+        fxBuzz([10, 30, 10]);
+    }
+
     function buildRecs(profile) {
         return profile.recs.map(function (r) {
             var hit = Q.pickFrom(Object.assign({ count: 1, weighted: true }, r.rule));
@@ -170,6 +196,7 @@
             btn.appendChild(span);
             btn.addEventListener('click', function () {
                 btn.classList.add('chosen');
+                fxAnswer();
                 scores[opt.profile] = (scores[opt.profile] || 0) + 1;
                 setTimeout(next, 260);
             });
@@ -205,6 +232,7 @@
         renderResult();
         $('qz-bar').style.width = '100%';
         showScreen('qz-result');
+        fxResult();
     }
 
     function renderResult() {

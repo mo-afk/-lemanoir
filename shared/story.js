@@ -2,11 +2,16 @@
    LE MANOIR — CARTE STORY 9:16 partagée (Instagram / WhatsApp)
    --------------------------------------------------------------------------
    Génère une carte verticale 360x640 (exportée en 1080x1920 via html2canvas)
-   avec la charte Le Manoir, puis :
-     • Appareil mobile avec Web Share API (fichiers) : partage natif direct
-       (Instagram Stories / WhatsApp / etc.) via File.
-     • Repli gracieux (desktop ou sans partage de fichiers natif) : modale avec
-       bouton "TÉLÉCHARGER LA CARTE" pour sauvegarder le PNG.
+   avec la charte Le Manoir, puis ouvre toujours une MODALE D'APERÇU avec
+   DEUX actions principales :
+     1. "PARTAGER LA STORY" : navigator.share() avec le PNG en File
+        -> feuille de partage native (Instagram Stories / WhatsApp / etc.).
+        Le PNG est pré-généré à l'ouverture de la modale afin que l'appel à
+        navigator.share() reste DANS le geste utilisateur (obligatoire sur
+        iOS Safari pour que la feuille de partage s'ouvre sans blocage).
+     2. "TÉLÉCHARGER" : enregistre le PNG (galerie / téléchargements).
+   Repli gracieux : sans Web Share API fichiers -> partage texte/url,
+   sinon téléchargement direct.
    API : window.LM_STORY.show(cfg) / .close() / .share() / .download()
    cfg : objet ou fonction (re-traduite au changement de langue).
    i18n : les libellés de l'UI de la carte suivent window.LM_I18N (FR / EN).
@@ -15,10 +20,13 @@
     'use strict';
 
     var CARD_W = 360, CARD_H = 640, EXPORT_SCALE = 3; /* -> 1080 x 1920 */
+    var FILENAME = 'le-manoir-story.png';
 
     var overlay, scaleWrap, fitBox, card, els, closeBtn, shareBtn, dlBtn;
     var currentCfg = null, currentStoryDir = 'ltr', busy = false;
-    var activeTrigger = null, originalTriggerHtml = '';
+    /* PNG pré-généré en arrière-plan dès l'ouverture de la modale :
+       permet d'appeler navigator.share() instantanément dans le geste. */
+    var pendingBlob = null, pendingRender = null;
 
     function I() { return window.LM_I18N; }
     function t(key, params) { return I() ? I().t(key, params) : key; }
@@ -30,7 +38,7 @@
         return n;
     }
 
-    /* Détection mobile & Web Share API supportant les fichiers */
+    /* Détection mobile (informatif uniquement : la modale s'affiche partout) */
     function isMobileDevice() {
         var ua = navigator.userAgent || '';
         var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -46,10 +54,6 @@
         } catch (e) {
             return false;
         }
-    }
-
-    function supportsNativeFileShare() {
-        return isMobileDevice() && canShareFiles();
     }
 
     function ensureDOM() {
@@ -95,13 +99,19 @@
         scaleWrap.appendChild(card);
         fitBox.appendChild(scaleWrap);
 
+        /* ---------- DEUX actions principales sous l'aperçu ---------- */
         var actions = el('div', 'lm-story-actions');
-        shareBtn = el('button', 'lm-story-btn', '<i class="fas fa-camera"></i><span></span>');
+
+        /* 1. PARTAGER LA STORY -> navigator.share() avec le PNG en File */
+        shareBtn = el('button', 'lm-story-btn primary', '<i class="fas fa-paper-plane"></i><span></span>');
         shareBtn.id = 'lm-story-share';
+        shareBtn.setAttribute('aria-label', t('story.share.action'));
         shareBtn.addEventListener('click', share);
 
-        dlBtn = el('button', 'lm-story-btn', '<i class="fas fa-download"></i><span></span>');
+        /* 2. TÉLÉCHARGER -> enregistre le PNG (galerie / téléchargements) */
+        dlBtn = el('button', 'lm-story-btn ghost', '<i class="fas fa-download"></i><span></span>');
         dlBtn.id = 'lm-story-download';
+        dlBtn.setAttribute('aria-label', t('story.download.action'));
         dlBtn.addEventListener('click', download);
 
         actions.appendChild(shareBtn);
@@ -127,7 +137,10 @@
         /* Synchronisation avec le changement de langue */
         document.addEventListener('languagechange', function () {
             refreshStaticTexts();
-            if (overlay.classList.contains('open') && !busy) render();
+            if (overlay.classList.contains('open') && !busy) {
+                render();
+                prewarm();
+            }
         });
 
         refreshStaticTexts();
@@ -136,14 +149,14 @@
     function refreshStaticTexts() {
         if (closeBtn) closeBtn.setAttribute('aria-label', t('aria.close'));
         if (els && els.logoSub) els.logoSub.textContent = t('story.logo-sub');
-        if (dlBtn) dlBtn.querySelector('span').textContent = t('story.download');
-        if (shareBtn && !busy) shareBtn.querySelector('span').textContent = t('story.share');
+        if (dlBtn && !busy) dlBtn.innerHTML = '<i class="fas fa-download"></i><span>' + t('story.download.action') + '</span>';
+        if (shareBtn && !busy) shareBtn.innerHTML = '<i class="fas fa-paper-plane"></i><span>' + t('story.share.action') + '</span>';
     }
 
     function fit() {
         if (!overlay) return;
         var availW = window.innerWidth - 32;
-        var availH = window.innerHeight - 210; /* actions + marges */
+        var availH = window.innerHeight - 220; /* actions + marges */
         var s = Math.min(1, availW / CARD_W, availH / CARD_H);
         if (s < 0.4) s = 0.4;
         scaleWrap.style.transform = 'scale(' + s + ')';
@@ -151,41 +164,20 @@
         fitBox.style.height = (CARD_H * s) + 'px';
     }
 
-    function setTriggerBusy(b) {
-        busy = b;
-        if (b) {
-            var active = document.activeElement;
-            if (active && (active.id === 'act-share' || active.id === 'wp-share' || active.id === 'qz-share' ||
-                active.classList.contains('result-btn') || active.classList.contains('spin-btn'))) {
-                activeTrigger = active;
-                originalTriggerHtml = active.innerHTML;
-                active.disabled = true;
-                active.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + t('story.generating') + '</span>';
-            }
-        } else {
-            if (activeTrigger) {
-                activeTrigger.disabled = false;
-                activeTrigger.innerHTML = originalTriggerHtml;
-                activeTrigger = null;
-            }
-        }
-    }
-
-    function setBusy(b, label) {
+    function setBusy(b, which, label) {
         busy = b;
         if (overlay) {
             var btns = overlay.querySelectorAll('.lm-story-btn');
-            Array.prototype.forEach.call(btns, function (btnEl) {
-                btnEl.disabled = b;
-            });
-            if (dlBtn && b && label) {
-                dlBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + label + '</span>';
-            }
-            if (!b && dlBtn) {
-                dlBtn.innerHTML = '<i class="fas fa-download"></i><span>' + t('story.download') + '</span>';
+            Array.prototype.forEach.call(btns, function (btnEl) { btnEl.disabled = b; });
+            var target = which === 'share' ? shareBtn : which === 'download' ? dlBtn : null;
+            if (target) {
+                if (b) {
+                    target.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + (label || t('story.generating')) + '</span>';
+                } else {
+                    refreshStaticTexts();
+                }
             }
         }
-        if (!b) setTriggerBusy(false);
     }
 
     /* Remplit la carte avec la config du jeu (objet ou fonction) */
@@ -220,29 +212,21 @@
         setBusy(false);
         refreshStaticTexts();
 
-        /* Dans la modale de repli, le bouton Télécharger est l'action principale */
-        if (shareBtn) shareBtn.style.display = 'none';
-        if (dlBtn) {
-            dlBtn.style.display = 'inline-flex';
-            dlBtn.className = 'lm-story-btn';
-            dlBtn.innerHTML = '<i class="fas fa-download"></i><span>' + t('story.download') + '</span>';
-        }
-
         overlay.classList.add('open');
         if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fit);
         else fit();
+
+        /* Pré-génération du PNG dès l'ouverture : le partage natif pourra
+           être déclenché instantanément dans le geste utilisateur. */
+        prewarm();
     }
 
     function show(cfg) {
         ensureDOM();
         currentCfg = cfg || {};
-        render();
-
-        if (supportsNativeFileShare()) {
-            shareNative();
-        } else {
-            openModal();
-        }
+        pendingBlob = null;
+        pendingRender = null;
+        openModal();
     }
 
     function close() {
@@ -250,6 +234,7 @@
         overlay.classList.remove('open');
     }
 
+    /* ------------------------------------------------- Rendu PNG (blob) --- */
     function renderCanvas() {
         return new Promise(function (resolve, reject) {
             if (typeof window.html2canvas !== 'function') {
@@ -290,11 +275,32 @@
         });
     }
 
+    /* Génère le PNG une seule fois par ouverture (et le met en cache).
+       resolve(false) si la génération échoue. */
+    function prewarm() {
+        if (pendingBlob || pendingRender) return;
+        pendingRender = renderBlob().then(function (blob) {
+            pendingBlob = blob;
+            pendingRender = null;
+        }).catch(function () {
+            pendingRender = null;
+        });
+    }
+
+    function getReadyBlob() {
+        if (pendingBlob) return Promise.resolve(pendingBlob);
+        prewarm();
+        return pendingRender ? pendingRender.then(function () {
+            return pendingBlob;
+        }) : Promise.resolve(null);
+    }
+
+    /* -------------------------------------------------- Téléchargement --- */
     function downloadBlob(blob, filename) {
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url;
-        a.download = filename || 'le-manoir-story.png';
+        a.download = filename || FILENAME;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -303,54 +309,76 @@
 
     function download() {
         if (busy) return;
-        setBusy(true, t('story.generating'));
-        renderBlob().then(function (blob) {
+        setBusy(true, 'download', t('story.generating'));
+        getReadyBlob().then(function (blob) {
+            if (!blob) throw new Error('no blob');
             setBusy(false);
-            downloadBlob(blob, 'le-manoir-story.png');
+            downloadBlob(blob, FILENAME);
+            /* Feedback non bloquant sur le bouton */
+            if (dlBtn) {
+                dlBtn.innerHTML = '<i class="fas fa-check"></i><span>' + t('story.downloaded') + '</span>';
+                setTimeout(refreshStaticTexts, 2200);
+            }
         }).catch(function () {
             setBusy(false);
             window.alert(t('story.alert-error'));
         });
     }
 
-    function shareNative() {
-        if (busy) return;
-        setTriggerBusy(true);
-        renderBlob().then(function (blob) {
-            setTriggerBusy(false);
-            var file;
-            try {
-                file = new File([blob], 'le-manoir-story.png', { type: 'image/png' });
-            } catch (e) {
-                openModal();
-                return;
-            }
-            var cfg = resolveCfg();
-            var text = (cfg.title ? cfg.title + ' — ' : '') + 'Le Manoir · ' + t('story.logo-sub');
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: 'Le Manoir',
-                    text: text
-                }).catch(function (err) {
-                    if (err && err.name === 'AbortError') return; /* Annulation utilisateur */
-                    openModal();
-                });
-            } else {
-                openModal();
-            }
-        }).catch(function () {
-            setTriggerBusy(false);
-            openModal();
-        });
+    /* ------------------------------------------------ Partage natif --- */
+    function shareTextOnlyFallback() {
+        if (!navigator.share) return Promise.reject(new Error('no share'));
+        var cfg = resolveCfg();
+        var text = (cfg.title ? cfg.title + ' — ' : '') + 'Le Manoir · ' + t('story.logo-sub');
+        return navigator.share({ title: 'Le Manoir', text: text, url: window.location.href });
+    }
+
+    function shareBlob(blob) {
+        var file = null;
+        try {
+            file = new File([blob], FILENAME, { type: 'image/png' });
+        } catch (e) { file = null; }
+
+        var cfg = resolveCfg();
+        var text = (cfg.title ? cfg.title + ' — ' : '') + 'Le Manoir · ' + t('story.logo-sub');
+
+        /* 1. Partage natif du fichier PNG (Instagram Stories, WhatsApp, …).
+              Appel fait dans le geste utilisateur : blob déjà prêt (pré-généré). */
+        if (file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            return navigator.share({ files: [file], title: 'Le Manoir', text: text });
+        }
+        /* 2. Web Share sans fichiers (desktop / ancien mobile) */
+        if (navigator.share && isMobileDevice()) {
+            return shareTextOnlyFallback();
+        }
+        /* 3. Repli : téléchargement direct du PNG */
+        downloadBlob(blob, FILENAME);
+        return Promise.resolve();
     }
 
     function share() {
-        if (supportsNativeFileShare()) {
-            shareNative();
-        } else {
-            download();
+        if (busy) return;
+        /* PNG déjà pré-généré : navigator.share() est appelé de manière
+           synchrone dans le handler du clic (requis par iOS Safari). */
+        if (pendingBlob) {
+            shareBlob(pendingBlob).catch(function (err) {
+                if (err && err.name === 'AbortError') return; /* annulation utilisateur */
+                /* Échec du partage (ex. permission) : on propose le PNG en téléchargement */
+                downloadBlob(pendingBlob, FILENAME);
+            });
+            return;
         }
+        /* Sinon : courte génération puis partage */
+        setBusy(true, 'share', t('story.generating'));
+        getReadyBlob().then(function (blob) {
+            setBusy(false);
+            if (!blob) throw new Error('no blob');
+            return shareBlob(blob);
+        }).catch(function (err) {
+            setBusy(false);
+            if (err && err.name === 'AbortError') return;
+            window.alert(t('story.alert-error'));
+        });
     }
 
     window.LM_STORY = {

@@ -23,41 +23,27 @@
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ------------------------------------------------------------- Audio --- */
-    var audioCtx = null, soundOn = true;
-
+    /* Sons (Web Audio) + vibrations délégués à shared/fx.js, qui gère le
+       déblocage du contexte audio au premier geste utilisateur (mobile).
+       Repli local (vibration seule) si fx.js n'est pas chargé. */
     function ensureAudio() {
-        if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            } catch (e) { /* silence */ }
-        }
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(function () {});
+        if (window.LM_FX) window.LM_FX.unlock();
     }
 
-    function blip(freq, ms, vol, type) {
-        if (!soundOn || !audioCtx || audioCtx.state !== 'running') return;
-        try {
-            var t0 = audioCtx.currentTime;
-            var o = audioCtx.createOscillator();
-            var g = audioCtx.createGain();
-            o.type = type || 'square';
-            o.frequency.value = freq;
-            g.gain.setValueAtTime(vol, t0);
-            g.gain.exponentialRampToValueAtTime(0.0001, t0 + ms / 1000);
-            o.connect(g);
-            g.connect(audioCtx.destination);
-            o.start(t0);
-            o.stop(t0 + ms / 1000 + 0.02);
-        } catch (e) { /* ignore */ }
+    function tickSound() {
+        /* Tick de roue : son + vibration 15ms à chaque segment qui passe */
+        if (window.LM_FX) { window.LM_FX.tick(); return; }
+        if (navigator.vibrate && !reduced) navigator.vibrate(15);
     }
 
-    function tickSound() { blip(1900, 45, 0.06); }
     function winSound() {
-        blip(880, 140, 0.09, 'triangle');
-        setTimeout(function () { blip(1318, 260, 0.09, 'triangle'); }, 150);
+        /* Arrêt sur le segment gagnant : deux notes + [10, 30, 10] */
+        if (window.LM_FX) { window.LM_FX.win(); return; }
+        if (navigator.vibrate && !reduced) navigator.vibrate([10, 30, 10]);
     }
 
     function buzz(pattern) {
+        if (window.LM_FX) { window.LM_FX.buzz(pattern); return; }
         if (navigator.vibrate && !reduced) navigator.vibrate(pattern);
     }
 
@@ -98,7 +84,7 @@
     }
 
     function addPlayer(e) {
-        if (e) e.preventDefault();
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
         var name = input.value.replace(/\s+/g, ' ').trim();
         if (!name) return;
         if (players.length >= MAX_PLAYERS) {
@@ -279,8 +265,7 @@
                     void pointer.offsetWidth;
                     pointer.classList.add('tick');
                 }
-                tickSound();
-                buzz(6);
+                tickSound(); /* son + vibration 15ms (via shared/fx.js) */
             }
             if (p < 1) requestAnimationFrame(stepFn);
             else {
@@ -297,8 +282,7 @@
         spinBtn.disabled = false;
         hub.disabled = false;
         winner = players[winIndex];
-        winSound();
-        buzz([20, 60, 30, 60, 40]);
+        winSound(); /* notes de victoire + vibration [10, 30, 10] */
 
         currentJoke = Math.floor(Math.random() * JOKE_COUNT);
         renderResult();

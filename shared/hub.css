@@ -467,23 +467,24 @@ body.dark-mode .hub-dark-toggle i::before { content: "\f185"; }
 }
 .lm-sc-foot .lm-sc-ig { color: #A9764C; }
 
-/* ---------- Actions de partage ---------- */
+/* ---------- Actions de partage : 2 boutons principaux ---------- */
 .lm-story-actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    max-width: 420px;
+    max-width: 460px;
 }
 
 .lm-story-btn {
+    flex: 1 1 160px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 48px;
-    padding: 0.8rem 1.5rem;
+    min-height: 50px;
+    padding: 0.8rem 1.25rem;
     border-radius: 50px;
     border: 2px solid #C8956C;
     background: linear-gradient(135deg, #C8956C, #A9764C);
@@ -495,12 +496,22 @@ body.dark-mode .hub-dark-toggle i::before { content: "\f185"; }
     text-transform: uppercase;
     cursor: pointer;
     transition: all var(--transition);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .lm-story-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(200, 149, 108, 0.45); }
+.lm-story-btn:active { transform: scale(0.98); }
 .lm-story-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
-.lm-story-btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.4); }
-.lm-story-btn.ghost:hover { background: rgba(255, 255, 255, 0.1); }
+.lm-story-btn.primary {
+    background: linear-gradient(135deg, #C8956C, #A9764C);
+    box-shadow: 0 6px 20px rgba(200, 149, 108, 0.35);
+}
+.lm-story-btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.45); }
+.lm-story-btn.ghost:hover { background: rgba(255, 255, 255, 0.1); border-color: #fff; }
+
+@media (max-width: 379px) {
+    .lm-story-btn { flex-basis: 100%; font-size: 0.76rem; }
+}
 
 /* ---------- En-tête partagé des mini-jeux ---------- */
 .rm-header {
